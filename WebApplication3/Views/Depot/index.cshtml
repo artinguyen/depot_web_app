@@ -1,0 +1,35 @@
+﻿@model IEnumerable<DepotWebApp.Models.Tonbai>
+<div class="form-group form-inline">
+    <label for="blockSelect">Chọn block:</label>
+    <select class="form-control" id="blockSelect">
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+    </select>
+</div>
+    <div class="tab" id="tabs">
+        @foreach (var bay in Model)
+        {
+            <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay.Bay')">@bay.Bay</button>
+        }
+    </div>
+
+    <div id="left">
+        <table id="number">
+            <tr><td>5</td></tr>
+            <tr><td>4</td></tr>
+            <tr><td>3</td></tr>
+            <tr><td>2</td></tr>
+            <tr><td>1</td></tr>
+        </table>
+    </div>
+    <div id="right">
+        <table id="myTable">
+            <thead id="headerRow">
+            </thead>
+            <tbody id="table-body"></tbody>
+            <tfooter></tfooter>
+        </table>
+        <span id="num-container"></span>
+    </div>

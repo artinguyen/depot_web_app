@@ -1,0 +1,139 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+@media only screen and (max-width: 1024px) {
+        .text {
+	        margin-left: -9999px;
+        }
+        .st-cont {
+	        max-width: 50px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible; /* Hiển thị tooltip khi hover */
+            opacity: 1; /* Hiện tooltip */
+        }
+
+	    #myTable1 td, #myTable td {
+            min-width: 50px !important;
+	    }
+}
+
+
+#div1 {
+    width: 350px;
+    height: 70px;
+    padding: 10px;
+    border: 1px solid #aaaaaa;
+}
+.st-cont {
+	padding: 5px;
+	background-color: black;
+	display: inline-block;
+	color: white;
+	width: 106px;
+	text-align: center;
+}
+table {
+	border-collapse: collapse;
+}
+#myTable td {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+td {
+	max-width: 132px;
+	height: 30px;
+	min-width: 50px;
+}
+th {
+    padding: 10px;
+    border: none;
+}
+#left {
+	float: left;
+	margin-top: 40px;
+}
+#alpha, #number {
+	text-align: center;
+	font-weight: bold;
+}
+#number td{
+	width: 50px;
+}
+#right {
+	margin-bottom: 50px;
+}
+
+.tab {
+    overflow: hidden;
+    display: flex;
+    margin-left: 52px;
+}
+.tab button {
+    background-color: #f1f1f1;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 5px 22px;
+    margin: 0;
+    transition: 0.3s;
+    font-size: 17px;
+    display: inline-block;
+    border-radius: 0;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	border-right: 1px solid black;
+}
+.tab button:hover {
+    background-color: #ddd;
+}
+.tab button.active {
+    background-color: #ccc;
+}
+.tabcontent.active {
+    display: block;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#num-container {
+    font-weight: bold;
+    padding: 8px 0px;
+    display: inline-block;
+}
+
+#myTable1 td, #myTable td, #myTable th{
+    min-width: 50px;
+    text-align:center;
+}
+#blockSelect{
+    width: auto;
+}
