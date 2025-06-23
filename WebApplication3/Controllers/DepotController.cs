@@ -7,6 +7,7 @@ using DepotWebApp.Models;
 using System.Data.Entity;
 using System.Web.Script.Serialization;
 using System.IO;
+using System.Text.RegularExpressions;
 namespace WebApplication3.Controllers
 {
 
@@ -16,9 +17,8 @@ namespace WebApplication3.Controllers
         private TonbaiEntities _db = new TonbaiEntities();
         public ActionResult Index()
         {
-            var data = (from tb in _db.Tonbais
-                        where tb.Block == "A"
-                        select tb).Take(25).ToList();
+            var data = _db.Tonbais.ToList();
+            //data = 0;
             return View(data);
         }
         
@@ -39,8 +39,8 @@ namespace WebApplication3.Controllers
 
             foreach (var row in filteredList)
             {
-                string rowKey = row.Row;
-                string tierKey = row.Tier;
+                string rowKey = RemoveWhitespace(row.Row);
+                string tierKey = RemoveWhitespace(row.Tier);
 
                 if (!result.ContainsKey(rowKey))
                 {
@@ -49,15 +49,19 @@ namespace WebApplication3.Controllers
 
                 result[rowKey][tierKey] = new object[]
                 {
-                    row.Id,
-                    row.SoCont,
-                    row.Row,
-                    row.Tier
+                    row.ID,
+                    RemoveWhitespace(row.SoCont),
+                    RemoveWhitespace(row.Row),
+                    RemoveWhitespace(row.Tier)
                 };
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        private string RemoveWhitespace(string input)
+        {
+            return Regex.Replace(input, @"\s+", string.Empty);
+        }
 
         public ActionResult GetBayByBlock(string block)
         {
@@ -76,14 +80,15 @@ namespace WebApplication3.Controllers
             var serializer = new JavaScriptSerializer();
             var data = serializer.Deserialize<Dictionary<string, object>>(jsonString);
 
-            if (data != null && data.ContainsKey("id") && data.ContainsKey("row") && data.ContainsKey("tier"))
+            if (data != null && data.ContainsKey("socont") && data.ContainsKey("row") && data.ContainsKey("tier"))
             {
-                int id = Convert.ToInt32(data["id"]);
+                //int id = Convert.ToInt32(data["id"]);
+                string socont = data["socont"].ToString();
                 string row = data["row"].ToString();
                 string tier = data["tier"].ToString();
 
                 // Cập nhật thông tin
-                var tonbai = _db.Tonbais.Find(id);
+                var tonbai = _db.Tonbais.Find(socont);
                 if (tonbai != null)
                 {
                     tonbai.Row = row;

@@ -59,14 +59,16 @@ function dropHandler(ev) {
                 const _this = ev.target;
                 const row = _this.getAttribute('data-row');
                 const div = this.querySelector('div');
-                const dataId = div.getAttribute('data-id');
+                //const dataId = div.getAttribute('data-id');
+                const socont = div.getAttribute('data-socont');
                 // Lấy data-tier từ tr cha
                 const tier = _this.closest('tr').getAttribute('data-tier');
 
                 const dataCntr = {
-                    'id': dataId,
+                    //'id': dataId,
                     'row': row,
-                    'tier': tier
+                    'tier': tier,
+                    'socont': socont
                 };
                 // Update position of container
                 updatePosition(dataCntr);
@@ -194,6 +196,7 @@ function tabActive(data) {
                 //div.className = 'st-cont tooltip';
                 div.className = 'st-cont';
                 div.setAttribute('data-id', item[0]);
+                div.setAttribute('data-socont', item[1]);
                 if (item[4]) {
                     div.style.backgroundColor = item[4];
                 }
