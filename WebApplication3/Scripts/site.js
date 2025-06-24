@@ -197,8 +197,8 @@ function tabActive(data) {
                 div.className = 'st-cont';
                 div.setAttribute('data-id', item[0]);
                 div.setAttribute('data-socont', item[1]);
-                if (item[4]) {
-                    div.style.backgroundColor = item[4];
+                if (lineColor[item[4]]) {
+                    div.style.backgroundColor = '#' + lineColor[item[4]];
                 }
 
                 const spanText = document.createElement('span');
@@ -264,7 +264,7 @@ document.getElementById('blockSelect').addEventListener('change', function () {
                         tabButton.className = 'tablinks';
                         tabButton.textContent = item.Bay;
                         tabButton.onclick = function (event) {
-                            openTab(event, `Tab@bay${item.Id}`, item.Bay);
+                            openTab(event, `Tab@bay${item.Bay}`, item.Bay);
                         };
                         document.getElementById('tabs').appendChild(tabButton);
 
@@ -280,3 +280,12 @@ document.getElementById('blockSelect').addEventListener('change', function () {
             });
     }
 });
+
+setInterval(function () {
+    const activeButton = document.querySelector('.tablinks.active');
+
+    if (activeButton) {
+        activeButton.click();
+    }
+}
+    , 2000);

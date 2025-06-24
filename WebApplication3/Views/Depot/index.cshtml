@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DepotWebApp.Models.Tonbai>
+﻿@model WebApplication3.Controllers.DepotController.BayViewModel
 <div class="form-group form-inline">
     <label for="blockSelect">Chọn block:</label>
     <select class="form-control" id="blockSelect">
@@ -9,9 +9,9 @@
     </select>
 </div>
     <div class="tab" id="tabs">
-        @foreach (var bay in Model)
+        @foreach (var bay in Model.Bays)
         {
-            <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay.Bay')">@bay.Bay</button>
+            <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay')">@bay</button>
         }
     </div>
 

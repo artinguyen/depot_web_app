@@ -17,11 +17,26 @@ namespace WebApplication3.Controllers
         private TonbaiEntities _db = new TonbaiEntities();
         public ActionResult Index()
         {
-            var data = _db.Tonbais.ToList();
-            //data = 0;
-            return View(data);
+            var data = _db.Tonbais
+              .Where(tb => tb.Block == "A")
+              .Select(tb => tb.Bay.Trim())
+              .Distinct()
+              .Take(25)
+              .ToList();
+
+            var viewModel = new BayViewModel
+            {
+                Bays = data
+            };
+
+            return View(viewModel);
         }
-        
+
+        public class BayViewModel
+        {
+            public IEnumerable<string> Bays { get; set; }
+        }
+
         public ActionResult GetContByBay(string block, string bay)
         {
             var filteredList = _db.Tonbais
@@ -52,7 +67,8 @@ namespace WebApplication3.Controllers
                     row.ID,
                     RemoveWhitespace(row.SoCont),
                     RemoveWhitespace(row.Row),
-                    RemoveWhitespace(row.Tier)
+                    RemoveWhitespace(row.Tier),
+                    row.HangTau
                 };
             }
             return Json(result, JsonRequestBehavior.AllowGet);
@@ -63,11 +79,19 @@ namespace WebApplication3.Controllers
             return Regex.Replace(input, @"\s+", string.Empty);
         }
 
+        public class BayObject
+        {
+            public string Bay { get; set; }
+        }
+
         public ActionResult GetBayByBlock(string block)
         {
             var data = (from tb in _db.Tonbais
                         where tb.Block == block
-                        select tb).Take(25).ToList();
+                        select new BayObject { Bay = tb.Bay.Trim() })
+                         .Distinct()
+                         .Take(25)
+                         .ToList();
             return Json(data, JsonRequestBehavior.AllowGet);
 
         }

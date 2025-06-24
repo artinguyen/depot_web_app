@@ -23,6 +23,8 @@ namespace DepotWebApp.Models
         public string Block { get; set; }
         public string Row { get; set; }
         public string Tier { get; set; }
+
+        public string HangTau { get; set; }
         /*
         [Column("ID")]
         public decimal? ID { get; set; } // Nullable vì trong bảng cho phép NULL
