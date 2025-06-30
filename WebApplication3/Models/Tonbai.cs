@@ -25,6 +25,8 @@ namespace DepotWebApp.Models
         public string Tier { get; set; }
 
         public string HangTau { get; set; }
+        public string Move { get; set; }
+        public string Truck { get; set; }
         /*
         [Column("ID")]
         public decimal? ID { get; set; } // Nullable vì trong bảng cho phép NULL

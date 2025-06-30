@@ -26,6 +26,18 @@ namespace WebApplication3
             );
 
             routes.MapRoute(
+                name: "GetMoveContainer",
+                url: "Depot/GetMoveContainer/{block}/{bay}",
+                defaults: new { controller = "Depot", action = "GetMoveContainer", bay = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GetTruckContainer",
+                url: "Depot/GetTruckContainer/{block}/{bay}",
+                defaults: new { controller = "Depot", action = "GetTruckContainer", bay = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Depot", action = "Index", id = UrlParameter.Optional }

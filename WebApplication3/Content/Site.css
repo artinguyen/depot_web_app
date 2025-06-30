@@ -137,3 +137,81 @@ th {
 #blockSelect{
     width: auto;
 }
+img {
+    width: 50px;
+    float: right;
+}
+
+/* Popup */
+.popup {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 2px;
+            z-index: 1000;
+            top: 40px;
+    right: -25px;
+    width: 100px;
+        }
+.tk-popup {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 2px;
+            z-index: 1000;
+            top: -50px;
+    right: 50px;
+    width: 100px;
+        }
+#drop-area {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.container {
+    position: relative;
+}
+#tableContainer table, #tableTruck table {
+    width: 100%;
+}
+#tableContainer, #tableTruck {
+    max-height: 165px;
+    overflow-y: auto;
+}
+#tableContainer table td,  #tableTruck table td{
+    border:1px solid black;
+    text-align: center;
+}
+#tableContainer table th, #tableTruck table th{
+    text-align: center;
+}
+
+@keyframes blink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+        .blinking-text {
+            text-align: center;
+            margin-top: 20%;
+            color: red;
+            animation: blink 1s infinite;
+        }
+#close, #close-truck {
+    position: absolute;
+    right: 5px;
+    cursor: pointer;
+}
+#truck-area {
+    position: relative;
+}

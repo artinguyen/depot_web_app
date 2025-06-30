@@ -7,29 +7,50 @@
         <option value="C">C</option>
         <option value="D">D</option>
     </select>
-</div>
-    <div class="tab" id="tabs">
-        @foreach (var bay in Model.Bays)
-        {
-            <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay')">@bay</button>
-        }
-    </div>
 
-    <div id="left">
-        <table id="number">
-            <tr><td>5</td></tr>
-            <tr><td>4</td></tr>
-            <tr><td>3</td></tr>
-            <tr><td>2</td></tr>
-            <tr><td>1</td></tr>
-        </table>
+
+</div>
+
+<div id="drop-area">
+    <img src="~/Content/Images/container.png" alt="Description of image" id="queue" />
+    <div class="container-popup">
+
+        <div class="popup" id="myPopup"><span id="close">X</span><div id="tableContainer"></div></div>
     </div>
-    <div id="right">
-        <table id="myTable">
-            <thead id="headerRow">
-            </thead>
-            <tbody id="table-body"></tbody>
-            <tfooter></tfooter>
-        </table>
-        <span id="num-container"></span>
+</div>
+
+
+<div class="tab" id="tabs">
+    @foreach (var bay in Model.Bays)
+    {
+        <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay')">@bay</button>
+    }
+</div>
+
+<div id="left">
+    <table id="number">
+        <tr><td>5</td></tr>
+        <tr><td>4</td></tr>
+        <tr><td>3</td></tr>
+        <tr><td>2</td></tr>
+        <tr><td>1</td></tr>
+    </table>
+</div>
+<div id="right">
+    <table id="myTable">
+        <thead id="headerRow">
+        </thead>
+        <tbody id="table-body"></tbody>
+        <tfooter></tfooter>
+    </table>
+    <span id="num-container"></span>
+</div>
+<div id="truckView">
+    <div id="truck-area">
+        <img src="~/Content/Images/container-truck.png" alt="Description of image" id="truck" />
+        <div class="truck-popup">
+
+            <div class="tk-popup" id="truckPopup"><span id="close-truck">X</span><div id="tableTruck">ấdfdsfsdf</div></div>
+        </div>
     </div>
+</div>
