@@ -51,29 +51,52 @@ namespace WebApplication3.Controllers
             {
                 return Json(new { message = "Không tìm thấy số cont với tier đã cho." }, JsonRequestBehavior.AllowGet);
             }
-
+            /*
             var result = new Dictionary<string, Dictionary<string, object[]>>();
 
             foreach (var row in filteredList)
             {
                 string rowKey = RemoveWhitespace(row.Row);
                 string tierKey = RemoveWhitespace(row.Tier);
-
+                
                 if (!result.ContainsKey(rowKey))
                 {
                     result[rowKey] = new Dictionary<string, object[]>();
                 }
-
+                
                 result[rowKey][tierKey] = new object[]
                 {
                     row.ID,
                     RemoveWhitespace(row.SoCont),
                     RemoveWhitespace(row.Row),
                     RemoveWhitespace(row.Tier),
-                    row.HangTau
+                    row.HangTau,
+                    row.KichCo
                 };
+                
+           
+
             }
-            return Json(result, JsonRequestBehavior.AllowGet);
+
+            
+            */
+            var results = new List<object[]>(); // Tạo danh sách để lưu trữ kết quả
+            foreach (var row in filteredList)
+            {
+                var result = new object[]
+                {
+        row.ID,
+        RemoveWhitespace(row.SoCont),
+        RemoveWhitespace(row.Row),
+        RemoveWhitespace(row.Tier),
+        row.HangTau,
+        row.KichCo
+                };
+
+                results.Add(result); // Thêm kết quả vào danh sách
+            }
+
+            return Json(results, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult GetMoveContainer(string block, string bay)

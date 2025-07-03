@@ -53,8 +53,9 @@ textarea {
 	background-color: black;
 	display: inline-block;
 	color: white;
-	width: 106px;
+	/*width: 98px;*/
 	text-align: center;
+    border: 1px solid #b1b1b1;
 }
 table {
 	border-collapse: collapse;
@@ -65,7 +66,7 @@ table {
 }
 
 td {
-	max-width: 132px;
+	#max-width: 204px;
 	height: 30px;
 	min-width: 50px;
 }
@@ -75,7 +76,7 @@ th {
 }
 #left {
 	float: left;
-	margin-top: 40px;
+	
 }
 #alpha, #number {
 	text-align: center;
@@ -92,6 +93,7 @@ th {
     overflow: hidden;
     display: flex;
     margin-left: 52px;
+    margin-bottom: 5px;
 }
 .tab button {
     background-color: #f1f1f1;
@@ -214,4 +216,10 @@ img {
 }
 #truck-area {
     position: relative;
+}
+.align-div {
+    #overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 52px;
 }

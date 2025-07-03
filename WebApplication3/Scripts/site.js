@@ -5,9 +5,11 @@ const headerRow = document.getElementById('headerRow');
 
 // Create th for table
 row_numbers.forEach(number => {
+    /*
     const th = document.createElement('th');
     th.textContent = number;
     headerRow.appendChild(th);
+    */
 });
 
 // Drag event
@@ -20,6 +22,7 @@ function dragstartHandler(ev) {
     if (aboveCell && aboveCell.innerText.trim() === '' || aboveCell === undefined) {
         ev.dataTransfer.setData("text", target.id);
     } else {
+        console.log(3)
         ev.preventDefault();
     }
 }
@@ -39,20 +42,94 @@ function dropHandler(ev) {
         const lastRow = tbody.rows[table.rows.length - 1];
         const index = Array.from(row.parentNode.children).indexOf(row);
         const colIndex = target.cellIndex;
+        //console.log(colIndex);
+        let side = '';
+        //return;
         const nextRow = tbody.rows[index + 1];
+        //console.log(tbody.rows[index]);
         let cell = "";
         if(nextRow != undefined) {
             cell = nextRow.cells[colIndex];
         }
         let previousCell = "";
         const previousRow = table.rows[index - 1];
+        //console.log(nextRow.cells[colIndex]);
+
+        
+        //return;
         //const previousCell = previousRow.cells[colIndex];
         if(previousRow != undefined) {
             previousCell = previousRow.cells[colIndex];
         }
+        //console.log(cell)
+        // Not last row, cont-4 move onto cont-2
+        if (cell) {
+            console.log('234')
+            let nextCellInfo = cell.getElementsByTagName('div');
+
+            let nextSizeCell = ((cell.getElementsByTagName('div'))[0]).getAttribute('data-size');
+            let currentContainer = ev.dataTransfer.getData("text");
+
+            let currentInfo = document.getElementById(currentContainer);
+            if (currentContainer.includes('truck')) {
+                currentInfo = document.getElementById(currentContainer.replace('truck', ''));
+            }
+            
+            const currentSize = currentInfo.getAttribute('data-size');
+
+            //console.log(nextSizeCell);
+            if (nextCellInfo.length == 1 && nextSizeCell[1] == '2' && currentSize[1]!= '2') {
+                return;
+            }
+        }
+        // Empty td
+        //console.log(cell); return;
+        if (!cell) {
+            let currentContainer = ev.dataTransfer.getData("text");
+            let currentInfo = document.getElementById(currentContainer);
+            if (currentContainer.includes('truck')) {
+                currentInfo = document.getElementById(currentContainer.replace('truck', ''));
+            }
+            const currentSize = currentInfo.getAttribute('data-size');
+
+            let currentCell = tbody.rows[index].cells[colIndex];
+            if( (currentCell.getElementsByTagName('div').length > 1 )) {
+                let currentSizeCell = ((currentCell.getElementsByTagName('div'))[0]).getAttribute('data-size');
+
+                if (currentCell.length == 1 && currentSizeCell[1] == '2' && currentSize[1] != '2') {
+                    return;
+                }
+            }
+            
+        }
+
+        // Cont-4 move into cont-2
+        let currentCell = tbody.rows[index].cells[colIndex];
+        //console.log(currentCell.getElementsByTagName('div').length);
+        //return;
+        let currentCellId = '';
+        if ((currentCell.getElementsByTagName('div').length == 1)) {
+            
+            let currentContainer = ev.dataTransfer.getData("text");
+            currentCellId = ((currentCell.getElementsByTagName('div'))[0]).getAttribute('id');
+            console.log('Day la'+currentCellId)
+            let currentInfo = document.getElementById(currentContainer);
+            if (currentContainer.includes('truck')) {
+                currentInfo = document.getElementById(currentContainer.replace('truck', ''));
+            }
+            const currentSize = currentInfo.getAttribute('data-size');
+            //console.log((currentCell.getElementsByTagName('div'))[0])
+            let currentSizeCell = ((currentCell.getElementsByTagName('div'))[0]).getAttribute('data-size');
+
+            if (currentSizeCell[1] == '2' && currentSize[1] != '2') {
+                return;
+            }
+
+        }
+        //return;
 
         if((previousCell.innerText == '' && cell.innerText == '') || (previousCell == '' && cell.innerText == '')) {
-            console.log(111)
+            //console.log(111)
             return;
         } else {
             let data = ev.dataTransfer.getData("text");
@@ -75,7 +152,10 @@ function dropHandler(ev) {
                 const blockSelect = document.getElementById('blockSelect');
                 const selectedBlock = blockSelect.value;
                 const activeElement = document.querySelector('.active');
-                const activeBay = activeElement.innerText;
+                let activeBay = activeElement.innerText;
+                if (activeBay[1] == 0) {
+                    activeBay = activeBay[0] + activeBay[2];
+                }
                 const dataCntr = {
                     //'id': dataId,
                     'block': selectedBlock,
@@ -91,16 +171,49 @@ function dropHandler(ev) {
             //console.log(1112)
             //if(cell.innerText != cont ) {
             else {
+                //console.log(1112)
                 const data = ev.dataTransfer.getData("text");
-                ev.target.appendChild(document.getElementById(data));
-                const _this = ev.target;
-                const row = _this.getAttribute('data-row');
-                const div = this.querySelector('div');
-                //const dataId = div.getAttribute('data-id');
-                const socont = div.getAttribute('data-socont');
-                // Lấy data-tier từ tr cha
-                const tier = _this.closest('tr').getAttribute('data-tier');
+                //const offsetX = ev.clientX;
 
+                /*
+                const dropzoneRect = (ev.target).getBoundingClientRect();
+                const offsetX = event.clientX - dropzoneRect.left;
+
+                //console.log(dropzoneRect, offsetX)
+                if (offsetX < dropzoneRect.width / 2) {
+                    const firstChild = (ev.target).firstChild;
+                    ev.target.insertBefore(document.getElementById(data), firstChild)
+                } else {
+                    ev.target.appendChild(document.getElementById(data));
+                }
+                */
+                ev.target.appendChild(document.getElementById(data));
+                //console.log((document.getElementById(data).getAttribute('data-size'))[0])
+                if ((document.getElementById(data).getAttribute('data-size'))[0] == '2') {
+                    ev.target.style.minWidth = '120px';
+                    //cell.style.backgroundColor = 'grey';
+                    //cell.style.textAlign = 'left'
+                }
+                const _this = ev.target;
+                //console.log(_this)
+                // Find cont
+                const row = _this.getAttribute('data-row');
+                let socont = '';
+                // Find cont
+                if ((_this.getElementsByTagName('div')).length == 2) {
+                    const div = _this.getElementsByTagName('div')[1];
+                    socont = div.getAttribute('data-socont');
+                    //console.log(socont)
+                } else {
+                    const div = this.querySelector('div');
+                    //const dataId = div.getAttribute('data-id');
+                    socont = div.getAttribute('data-socont');
+                }
+                    // Lấy data-tier từ tr cha
+                const tier = _this.closest('tr').getAttribute('data-tier');
+                //console.log(currentCellId);
+                // Check side
+                console.log(checkSideCont(currentCellId, data))
                 const dataCntr = {
                     //'id': dataId,
                     'row': row,
@@ -115,6 +228,8 @@ function dropHandler(ev) {
             
             //console.log(data)
         }
+    } else {
+        console.log(4)
     }
 }
 
@@ -207,7 +322,7 @@ function getPosition(block, bay) {
         return response.json();
     })
     .then(data => {
-        tabActive(data);
+        tabActive2(data);
     })
     .catch(error => {
         console.error("Error:", error);
@@ -273,6 +388,7 @@ function tabActive(data) {
             */
             cell.setAttribute('data-row', `${val}`);
             const item = data[val] && data[val][i];
+            //console.log(data[val])
             if (item) {
                 const div = document.createElement('div');
                 div.setAttribute('draggable', 'true');
@@ -282,8 +398,12 @@ function tabActive(data) {
                 div.className = 'st-cont';
                 div.setAttribute('data-id', item[0]);
                 div.setAttribute('data-socont', item[1]);
+                div.setAttribute('data-size', item[5]);
                 if (lineColor[item[4]]) {
                     div.style.backgroundColor = '#' + lineColor[item[4]];
+                }
+                if (item[5][1] != '2') {
+                    div.style.width = '';
                 }
 
                 const spanText = document.createElement('span');
@@ -301,7 +421,123 @@ function tabActive(data) {
 
             row.appendChild(cell);
         });
+        //return;
+        tableBody.appendChild(row);
+    }
+    // Initial previous events
+    init();
+    divHover();
+}
 
+function removeWhitespace(str) {
+    return str.trim(); // Loại bỏ khoảng trắng ở đầu và cuối chuỗi
+}
+
+function tabActive2(data) {
+    const tableBody = document.getElementById('table-body');
+    tableBody.innerHTML = '';
+    const tier = 5;
+    const row = 5;
+
+    for (let i = 5; i >= 1; i--) {
+        const row = document.createElement('tr');
+        row.setAttribute('data-tier', i);
+        row_numbers.forEach((val) => {
+            const cell = document.createElement('td');
+            /*
+            cell.setAttribute('data-row', `${val}${i}`);
+            const key = `${val}${i}`;
+            const item = data[key] && data[key][i];
+            */
+            cell.setAttribute('data-row', `${val}`);
+            //const item = data[val] && data[val][i];
+            //const item = ;
+            //console.log(data[val])
+
+            data.forEach(item => {
+                
+                //row[0], // null
+                   // removeWhitespace(row[1]),
+                if(removeWhitespace(item[2]) == val && removeWhitespace(item[3]) == i) {
+                    const div = document.createElement('div');
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('ondragstart', 'dragstartHandler(event)');
+                    div.setAttribute('id', item[1]);
+
+                    div.className = 'st-cont';
+                    div.setAttribute('data-id', item[0]);
+                    div.setAttribute('data-socont', item[1]);
+                    div.setAttribute('data-size', item[5]);
+                    if (lineColor[item[4]]) {
+                        div.style.backgroundColor = '#' + lineColor[item[4]];
+                    }
+                    if (item[5][1] != '2') {
+                        div.style.width = '';
+                    }
+
+                    const spanText = document.createElement('span');
+                    spanText.className = 'text';
+                    spanText.textContent = item[1];
+                    div.appendChild(spanText);
+
+                    cell.appendChild(div);
+                    const divs = (cell.getElementsByTagName('div'));
+                    //console.log(divs.length)
+                    if (item[5][0] == '2' && divs.length == 1) {
+                        cell.style.minWidth = '120px';
+                        //cell.style.backgroundColor = 'grey';
+                        //cell.style.textAlign = 'left'
+
+                    }
+                    if (item[5][0] == '2' && divs.length == 2) {
+                        Array.from(divs).forEach(div => {
+                            //div.style.width = '50px';
+                            //div.style.textOverflow = 'ellipsis';
+                            div.classList.add('align-div');
+                            cell.style = '';
+                        });
+                    }
+                }
+                
+                    //row[4],
+                    //removeWhitespace(row[5]);
+
+            });
+            
+            
+
+            if (i == '12345') {
+                const div = document.createElement('div');
+                div.setAttribute('draggable', 'true');
+                div.setAttribute('ondragstart', 'dragstartHandler(event)');
+                div.setAttribute('id', item[1]);
+                //div.className = 'st-cont tooltip';
+                div.className = 'st-cont';
+                div.setAttribute('data-id', item[0]);
+                div.setAttribute('data-socont', item[1]);
+                if (lineColor[item[4]]) {
+                    div.style.backgroundColor = '#' + lineColor[item[4]];
+                }
+                if (item[5][1] != '2') {
+                    div.style.width = '';
+                }
+
+                const spanText = document.createElement('span');
+                spanText.className = 'text';
+                spanText.textContent = item[1];
+                /*
+                const spanTooltip = document.createElement('span');
+                spanTooltip.className = 'tooltiptext';
+                spanTooltip.textContent = item[1];
+                */
+                div.appendChild(spanText);
+                //div.appendChild(spanTooltip);
+                cell.appendChild(div);
+            }
+
+            row.appendChild(cell);
+        });
+        //return;
         tableBody.appendChild(row);
     }
     // Initial previous events
@@ -328,7 +564,7 @@ function divHover() {
 // Block event
 document.getElementById('blockSelect').addEventListener('change', function () {
     const block = this.value;
-    console.log(block)
+    //console.log(block)
     if (block) {
         // Gọi fetch GET để lấy danh sách bay
         fetch(`/Depot/GetBayByBlock/${block}`)
@@ -347,7 +583,7 @@ document.getElementById('blockSelect').addEventListener('change', function () {
                         // Tạo nút tab
                         const tabButton = document.createElement('button');
                         tabButton.className = 'tablinks';
-                        tabButton.textContent = item.Bay;
+                        tabButton.textContent = (item.Bay).length > 2 ? item.Bay : item.Bay[0] + '0' + item.Bay[1];
                         tabButton.onclick = function (event) {
                             openTab(event, `Tab@bay${item.Bay}`, item.Bay);
                         };
@@ -373,7 +609,7 @@ setInterval(function () {
         activeButton.click();
     }
 }
-    , 2000);
+    , 200000);
 
 // Container
 const dropArea = document.getElementById('drop-area');
@@ -393,13 +629,16 @@ dropArea.addEventListener('drop', (ev) => {
     //ev.target.appendChild(document.getElementById(data));
     let cont = document.getElementById(data);
     cont.remove();
-    console.log(data)
+    //console.log(data)
     //dropArea.style.borderColor = '#ccc'; // Khôi phục màu viền
     const blockSelect = document.getElementById('blockSelect');
     const selectedBlock = blockSelect.value;
     const activeElement = document.querySelector('.active');
  
-    const activeBay = activeElement.innerText;
+    let activeBay = activeElement.innerText;
+    if (activeBay[1] == 0) {
+        activeBay = activeBay[0] + activeBay[2];
+    }
     const dataCntr = {
         //'id': dataId,
         'block': selectedBlock,
@@ -513,6 +752,7 @@ function createTruckTable(data) {
         div.setAttribute('id', item.SoCont.trim());
         //div.className = 'st-cont';
         div.setAttribute('data-id', item.SoCont);
+        div.setAttribute('data-size', item.KichCo);
         div.innerText = item.SoCont;
         // If you have another data attribute, uncomment the next line
         // div.setAttribute('data-socont', item[1]);
@@ -643,7 +883,10 @@ truckArea.addEventListener('drop', (ev) => {
     const selectedBlock = blockSelect.value;
     const activeElement = document.querySelector('.active');
 
-    const activeBay = activeElement.innerText;
+    let activeBay = activeElement.innerText;
+    if (activeBay[1] == 0) {
+        activeBay = activeBay[0] + activeBay[2];
+    }
     const dataCntr = {
         //'id': dataId,
         'block': selectedBlock,
@@ -679,3 +922,21 @@ truckDiv.addEventListener('click', function (event) {
     //myPopup.style.right = `${x * 2}px`;
     truckPopup.style.display = 'block'; // Hiện popup
 });
+
+
+// Check side of container
+function checkSideCont(cont1Id, cont2Id) {
+    const box1 = document.getElementById(cont1Id);
+    const box2 = document.getElementById(cont2Id);
+    if(box1 != undefined && box2 != undefined) {
+    const rect1 = box1.getBoundingClientRect();
+    const rect2 = box2.getBoundingClientRect();
+    //console.log(rect1, rect2)
+    if (rect1.left < rect2.left) {
+        
+        return 'left';
+    } else {
+        return 'right';
+    }
+    }
+}

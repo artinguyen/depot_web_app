@@ -23,7 +23,8 @@
 <div class="tab" id="tabs">
     @foreach (var bay in Model.Bays)
     {
-        <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay')">@bay</button>
+        string formattedBay = bay.Length == 2 ? $"{bay[0]}0{bay[1]}" : bay;
+        <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay')">@formattedBay</button>
     }
 </div>
 
