@@ -19,11 +19,42 @@ function dragstartHandler(ev) {
     const currentCell = target.closest('td');
     const aboveCell = currentCell.parentNode.previousElementSibling
     && currentCell.parentNode.previousElementSibling.children[currentCell.cellIndex];
+
+    
+    //console.log(currentCell.innerText)
+
+    localStorage.setItem('item', currentCell.innerText)
+
     if (aboveCell && aboveCell.innerText.trim() === '' || aboveCell === undefined) {
+        //return;
         ev.dataTransfer.setData("text", target.id);
     } else {
         console.log(3)
         ev.preventDefault();
+    }
+
+    
+}
+
+function dropCheck(ev) {
+    ev.preventDefault();
+    const data = ev.dataTransfer.getData("text");
+    const draggedElement = document.getElementById(data);
+    const targetCell = ev.target.closest('td'); // Tìm ô đích
+
+    // Lấy ô ngay bên dưới
+    const belowCell = targetCell.nextElementSibling;
+
+    // Kiểm tra ô ngay bên dưới có chứa <div> hay không
+    const hasDivInBelowCell = belowCell && belowCell.querySelector('div');
+
+    // Nếu ô bên dưới không có <div>, không cho phép di chuyển
+    if (belowCell && !hasDivInBelowCell) {
+        console.log("Không thể di chuyển vào ô này vì ô ngay dưới không có div.");
+        //alert("Không thể di chuyển vào ô này vì ô ngay dưới không có div."); // Thông báo cho người dùng
+    } else {
+        // Nếu điều kiện thỏa mãn, thực hiện di chuyển
+        //targetCell.appendChild(draggedElement);
     }
 }
 
@@ -32,7 +63,7 @@ function dragoverHandler(ev) {
 }
 
 function dropHandler(ev) {
-    
+    //dropCheck(ev)
     ev.preventDefault();
     const table = document.getElementById('myTable');
     const tbody = table.querySelector('tbody');
@@ -63,8 +94,8 @@ function dropHandler(ev) {
         }
         //console.log(cell)
         // Not last row, cont-4 move onto cont-2
-        if (cell) {
-            console.log('234')
+        if (cell && cell.getElementsByTagName('div').length > 0) {
+            //console.log(cell)
             let nextCellInfo = cell.getElementsByTagName('div');
 
             let nextSizeCell = ((cell.getElementsByTagName('div'))[0]).getAttribute('data-size');
@@ -126,12 +157,20 @@ function dropHandler(ev) {
             }
 
         }
+        let current = tbody.rows[index].cells[colIndex];
         //return;
-
-        if((previousCell.innerText == '' && cell.innerText == '') || (previousCell == '' && cell.innerText == '')) {
+        console.log('1' + previousCell.innerText, '2' + cell.innerText, '3' + current.innerText);
+        //retrun;
+        if (localStorage.getItem('item') == cell.innerText) {
+            console.log('Invalid')
+            return;
+        }
+        
+        if ((previousCell.innerText == '' && cell.innerText == '') || (previousCell == '' && cell.innerText == '') || (previousCell.innerText == '' && cell.innerText == '')) {
             //console.log(111)
             return;
         } else {
+            console.log('Valid');
             let data = ev.dataTransfer.getData("text");
             const containsMove = data.includes('truck'); // Kiểm tra có chứa "move || truck"
             if (containsMove) {
@@ -213,7 +252,7 @@ function dropHandler(ev) {
                 const tier = _this.closest('tr').getAttribute('data-tier');
                 //console.log(currentCellId);
                 // Check side
-                console.log(checkSideCont(currentCellId, data))
+                //console.log(checkSideCont(currentCellId, data))
                 const dataCntr = {
                     //'id': dataId,
                     'row': row,
@@ -490,11 +529,18 @@ function tabActive2(data) {
 
                     }
                     if (item[5][0] == '2' && divs.length == 2) {
-                        Array.from(divs).forEach(div => {
+                        Array.from(divs).forEach((div, index) => {
                             //div.style.width = '50px';
                             //div.style.textOverflow = 'ellipsis';
                             div.classList.add('align-div');
                             cell.style = '';
+                            cell.style.position = 'relative';
+                            if (index === 0) {
+                                div.style.float = 'left';
+                            } else {
+                                div.style.float = 'right';
+                            }
+
                         });
                     }
                 }
@@ -609,7 +655,7 @@ setInterval(function () {
         activeButton.click();
     }
 }
-    , 200000);
+    , 2000);
 
 // Container
 const dropArea = document.getElementById('drop-area');
