@@ -51,9 +51,9 @@ textarea {
 .st-cont {
 	padding: 5px;
 	background-color: black;
-	display: inline-block;
+	display: inline-flex;
 	color: white;
-	/*width: 98px;*/
+	width: 102px;
 	text-align: center;
     border: 1px solid #b1b1b1;
 }

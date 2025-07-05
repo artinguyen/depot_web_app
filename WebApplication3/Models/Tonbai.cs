@@ -28,6 +28,8 @@ namespace DepotWebApp.Models
         public string Move { get; set; }
         public string Truck { get; set; }
         public string KichCo { get; set; }
+
+        public string Position { get; set; }
         /*
         [Column("ID")]
         public decimal? ID { get; set; } // Nullable vì trong bảng cho phép NULL

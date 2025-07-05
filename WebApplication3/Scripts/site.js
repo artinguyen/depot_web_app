@@ -20,42 +20,14 @@ function dragstartHandler(ev) {
     const aboveCell = currentCell.parentNode.previousElementSibling
     && currentCell.parentNode.previousElementSibling.children[currentCell.cellIndex];
 
-    
-    //console.log(currentCell.innerText)
-
     localStorage.setItem('item', currentCell.innerText)
-
-    if (aboveCell && aboveCell.innerText.trim() === '' || aboveCell === undefined) {
-        //return;
+    console.log(currentCell.parentNode.previousElementSibling)
+    if (aboveCell && aboveCell.innerText.trim() === '' || aboveCell === undefined || aboveCell == null) {
         ev.dataTransfer.setData("text", target.id);
     } else {
-        console.log(3)
         ev.preventDefault();
     }
-
-    
-}
-
-function dropCheck(ev) {
-    ev.preventDefault();
-    const data = ev.dataTransfer.getData("text");
-    const draggedElement = document.getElementById(data);
-    const targetCell = ev.target.closest('td'); // Tìm ô đích
-
-    // Lấy ô ngay bên dưới
-    const belowCell = targetCell.nextElementSibling;
-
-    // Kiểm tra ô ngay bên dưới có chứa <div> hay không
-    const hasDivInBelowCell = belowCell && belowCell.querySelector('div');
-
-    // Nếu ô bên dưới không có <div>, không cho phép di chuyển
-    if (belowCell && !hasDivInBelowCell) {
-        console.log("Không thể di chuyển vào ô này vì ô ngay dưới không có div.");
-        //alert("Không thể di chuyển vào ô này vì ô ngay dưới không có div."); // Thông báo cho người dùng
-    } else {
-        // Nếu điều kiện thỏa mãn, thực hiện di chuyển
-        //targetCell.appendChild(draggedElement);
-    }
+   
 }
 
 function dragoverHandler(ev) {
@@ -63,7 +35,10 @@ function dragoverHandler(ev) {
 }
 
 function dropHandler(ev) {
-    //dropCheck(ev)
+    // Lấy tọa độ chuột
+    const dropX = ev.clientX;
+    let position = '';
+
     ev.preventDefault();
     const table = document.getElementById('myTable');
     const tbody = table.querySelector('tbody');
@@ -73,26 +48,18 @@ function dropHandler(ev) {
         const lastRow = tbody.rows[table.rows.length - 1];
         const index = Array.from(row.parentNode.children).indexOf(row);
         const colIndex = target.cellIndex;
-        //console.log(colIndex);
         let side = '';
         //return;
         const nextRow = tbody.rows[index + 1];
-        //console.log(tbody.rows[index]);
         let cell = "";
         if(nextRow != undefined) {
             cell = nextRow.cells[colIndex];
         }
         let previousCell = "";
         const previousRow = table.rows[index - 1];
-        //console.log(nextRow.cells[colIndex]);
-
-        
-        //return;
-        //const previousCell = previousRow.cells[colIndex];
         if(previousRow != undefined) {
             previousCell = previousRow.cells[colIndex];
         }
-        //console.log(cell)
         // Not last row, cont-4 move onto cont-2
         if (cell && cell.getElementsByTagName('div').length > 0) {
             //console.log(cell)
@@ -108,13 +75,12 @@ function dropHandler(ev) {
             
             const currentSize = currentInfo.getAttribute('data-size');
 
-            //console.log(nextSizeCell);
             if (nextCellInfo.length == 1 && nextSizeCell[1] == '2' && currentSize[1]!= '2') {
                 return;
             }
         }
         // Empty td
-        //console.log(cell); return;
+
         if (!cell) {
             let currentContainer = ev.dataTransfer.getData("text");
             let currentInfo = document.getElementById(currentContainer);
@@ -158,33 +124,48 @@ function dropHandler(ev) {
 
         }
         let current = tbody.rows[index].cells[colIndex];
-        //return;
-        console.log('1' + previousCell.innerText, '2' + cell.innerText, '3' + current.innerText);
-        //retrun;
+
         if (localStorage.getItem('item') == cell.innerText) {
             console.log('Invalid')
             return;
         }
         
         if ((previousCell.innerText == '' && cell.innerText == '') || (previousCell == '' && cell.innerText == '') || (previousCell.innerText == '' && cell.innerText == '')) {
-            //console.log(111)
             return;
         } else {
-            console.log('Valid');
             let data = ev.dataTransfer.getData("text");
             const containsMove = data.includes('truck'); // Kiểm tra có chứa "move || truck"
             if (containsMove) {
                 data = data.replace('truck', '');
                 const blinkingText = document.createElement('div'); // Tạo một phần tử div mới
-                blinkingText.className = 'blinking-text'; // Thêm lớp cho div
+                blinkingText.className = 'blinking-text st-cont'; // Thêm lớp cho div
                 blinkingText.textContent = document.getElementById(data).textContent; // Lấy nội dung từ phần tử khác
 
                 // Thêm phần tử div vào node mục tiêu
-                ev.target.appendChild(blinkingText);
+                //ev.target.appendChild(blinkingText);
                 const _this = ev.target;
+                console.log(_this.getElementsByTagName('div').length)
+                if ((_this.getElementsByTagName('div')).length == 1) {
+                    console.log('Vi tri'+dropX)
+                    if (checkSideCont(currentCellId, dropX) == 'right') {
+                        const firstChild = (ev.target).firstChild;
+                        ev.target.insertBefore(blinkingText, firstChild);
+                        position = 'left';
+                    } else {
+                        //ev.target.appendChild(document.getElementById(data));
+                        ev.target.appendChild(blinkingText);
+                        position = 'right';
+                    }
+                } else if ((_this.getElementsByTagName('div')).length == 0)  {
+              
+                    ev.target.appendChild(blinkingText);
+                    //ev.target.appendChild(document.getElementById(data));
+                }
+
                 const row = _this.getAttribute('data-row');
                 const div = this.querySelector('div');
                 //const dataId = div.getAttribute('data-id');
+
                 const socont = data;
                 // Lấy data-tier từ tr cha
                 const tier = _this.closest('tr').getAttribute('data-tier');
@@ -201,7 +182,8 @@ function dropHandler(ev) {
                     'bay': activeBay,
                     'row': row,
                     'tier': tier,
-                    'socont': socont
+                    'socont': socont,
+                    'position': position
                 };
                 // Update position of container
                 updatePosition(dataCntr);
@@ -226,22 +208,40 @@ function dropHandler(ev) {
                     ev.target.appendChild(document.getElementById(data));
                 }
                 */
-                ev.target.appendChild(document.getElementById(data));
-                //console.log((document.getElementById(data).getAttribute('data-size'))[0])
+
+               
+                const _this = ev.target;
+                if ((_this.getElementsByTagName('div')).length == 1) {
+                    if (checkSideCont(currentCellId, dropX) == 'right') {
+                        const firstChild = (ev.target).firstChild;
+                        ev.target.insertBefore(document.getElementById(data), firstChild);
+                        position = 'left';
+                    } else {
+                        ev.target.appendChild(document.getElementById(data));
+                        position = 'right';
+                    }
+                } else if ((_this.getElementsByTagName('div')).length == 0)  {
+                    ev.target.appendChild(document.getElementById(data));
+                }
                 if ((document.getElementById(data).getAttribute('data-size'))[0] == '2') {
                     ev.target.style.minWidth = '120px';
                     //cell.style.backgroundColor = 'grey';
                     //cell.style.textAlign = 'left'
                 }
-                const _this = ev.target;
+                
                 //console.log(_this)
                 // Find cont
                 const row = _this.getAttribute('data-row');
                 let socont = '';
                 // Find cont
                 if ((_this.getElementsByTagName('div')).length == 2) {
-                    const div = _this.getElementsByTagName('div')[1];
+                    let div = _this.getElementsByTagName('div')[0];
                     socont = div.getAttribute('data-socont');
+                    if (position == 'right') {
+                        const div = _this.getElementsByTagName('div')[1];
+                        socont = div.getAttribute('data-socont');
+                    } 
+                    
                     //console.log(socont)
                 } else {
                     const div = this.querySelector('div');
@@ -250,14 +250,12 @@ function dropHandler(ev) {
                 }
                     // Lấy data-tier từ tr cha
                 const tier = _this.closest('tr').getAttribute('data-tier');
-                //console.log(currentCellId);
-                // Check side
-                //console.log(checkSideCont(currentCellId, data))
                 const dataCntr = {
                     //'id': dataId,
                     'row': row,
                     'tier': tier,
-                    'socont': socont
+                    'socont': socont,
+                    'position' : position
                 };
                 // Update position of container
                 updatePosition(dataCntr);
@@ -279,10 +277,9 @@ function init() {
     const tds = table.getElementsByTagName('td');
     for (let td of tds) {
         td.ondragover = dragoverHandler;
-        td.ondrop = dropHandler;
+        td.ondrop = dropHandler
     }
 
-    
 }
 
 function updatePosition(data) {
@@ -438,6 +435,7 @@ function tabActive(data) {
                 div.setAttribute('data-id', item[0]);
                 div.setAttribute('data-socont', item[1]);
                 div.setAttribute('data-size', item[5]);
+                div.setAttribute('data-line', item[4]);
                 if (lineColor[item[4]]) {
                     div.style.backgroundColor = '#' + lineColor[item[4]];
                 }
@@ -471,6 +469,45 @@ function tabActive(data) {
 function removeWhitespace(str) {
     return str.trim(); // Loại bỏ khoảng trắng ở đầu và cuối chuỗi
 }
+let currentDraggedElement = null;
+function touchStartHandler(ev) {
+    const touch = ev.touches[0];
+    const img = ev.target;
+    img.dataset.startX = touch.clientX - img.offsetLeft; // Tính toán vị trí bắt đầu
+    img.dataset.startY = touch.clientY - img.offsetTop;
+    img.style.opacity = '0.5'; // Giảm độ trong suốt khi kéo
+    currentDraggedElement = img; // Lưu phần tử đang kéo
+}
+
+function touchMoveHandler(ev) {
+    if (!currentDraggedElement) return; // Nếu không có phần tử nào đang được kéo
+    const touch = ev.touches[0];
+}
+
+function touchEndHandler(ev) {
+    //console.log(ev)
+    // Kiểm tra vị trí thả và gọi dropHandler
+    const dropTarget = document.elementFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
+    if (dropTarget) {
+        dropTarget.appendChild(currentDraggedElement); // Append phần tử vào ô
+        currentDraggedElement.style.opacity = '1'; // Khôi phục độ trong suốt
+        const socont = currentDraggedElement.getAttribute('data-socont');
+        currentDraggedElement = null; // Reset phần tử đang kéo
+
+        const row = dropTarget.getAttribute('data-row');
+        //socont = div.getAttribute('data-socont');
+        const tier = dropTarget.closest('tr').getAttribute('data-tier');
+
+        const dataCntr = {
+            //'id': dataId,
+            'row': row,
+            'tier': tier,
+            'socont': socont,
+            'position': ''       };
+        // Update position of container
+        updatePosition(dataCntr);
+    }
+}
 
 function tabActive2(data) {
     const tableBody = document.getElementById('table-body');
@@ -501,12 +538,20 @@ function tabActive2(data) {
                     const div = document.createElement('div');
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', 'dragstartHandler(event)');
+
+                    div.addEventListener('touchstart', touchStartHandler);
+                    div.addEventListener('touchmove', touchMoveHandler);
+                    div.addEventListener('touchend', touchEndHandler);
+
+
                     div.setAttribute('id', item[1]);
 
                     div.className = 'st-cont';
                     div.setAttribute('data-id', item[0]);
                     div.setAttribute('data-socont', item[1]);
                     div.setAttribute('data-size', item[5]);
+                    div.setAttribute('data-line', item[4]);
+                    div.setAttribute('data-position', item[6]);
                     if (lineColor[item[4]]) {
                         div.style.backgroundColor = '#' + lineColor[item[4]];
                     }
@@ -532,14 +577,19 @@ function tabActive2(data) {
                         Array.from(divs).forEach((div, index) => {
                             //div.style.width = '50px';
                             //div.style.textOverflow = 'ellipsis';
+                            console.log(div.getAttribute('data-position'))
                             div.classList.add('align-div');
                             cell.style = '';
                             cell.style.position = 'relative';
-                            if (index === 0) {
-                                div.style.float = 'left';
-                            } else {
+                            /*
+                            console.log('Vi tri' + div.getAttribute('data-position'))
+                            if (div.getAttribute('data-position') == 'right') {
                                 div.style.float = 'right';
+                            } else {
+                                div.style.float = 'left';
                             }
+                            */
+                            div.style.float = div.getAttribute('data-position');
 
                         });
                     }
@@ -597,9 +647,11 @@ function divHover() {
     divElements.forEach(div => {
         div.addEventListener('mouseenter', function () {
             const text = this.querySelector('.text').innerText;
-            document.getElementById('num-container').innerText = 'Số container: ' + text;
+            const size = this.getAttribute('data-size');
+            const line = this.getAttribute('data-line');
+            document.getElementById('num-container').innerText = 'Số container: ' + text + ' / ' + size + ' / ' + line;
         });
-
+        
         div.addEventListener('mouseleave', function () {
             document.getElementById('num-container').innerText = '';
         });
@@ -973,12 +1025,15 @@ truckDiv.addEventListener('click', function (event) {
 // Check side of container
 function checkSideCont(cont1Id, cont2Id) {
     const box1 = document.getElementById(cont1Id);
-    const box2 = document.getElementById(cont2Id);
-    if(box1 != undefined && box2 != undefined) {
+
+    //const box2 = document.getElementById(cont2Id);
+    if(box1 != undefined ) {
     const rect1 = box1.getBoundingClientRect();
-    const rect2 = box2.getBoundingClientRect();
-    //console.log(rect1, rect2)
-    if (rect1.left < rect2.left) {
+    //const rect2 = box2.getBoundingClientRect();
+    // Cont1 cố định
+    console.log('Vi tri cont ' + rect1.right)
+    console.log('Vi tri drag ' + cont2Id)
+    if (rect1.right < cont2Id) {
         
         return 'left';
     } else {

@@ -90,7 +90,8 @@ namespace WebApplication3.Controllers
         RemoveWhitespace(row.Row),
         RemoveWhitespace(row.Tier),
         row.HangTau,
-        row.KichCo
+        row.KichCo,
+        row.Position
                 };
 
                 results.Add(result); // Thêm kết quả vào danh sách
@@ -227,7 +228,7 @@ namespace WebApplication3.Controllers
                 string socont = data["socont"].ToString();
                 string row = data["row"].ToString();
                 string tier = data["tier"].ToString();
-
+                string position = data["position"].ToString();
                 // Cập nhật thông tin
                 var tonbai = _db.Tonbais.Find(socont);
                 if (tonbai != null)
@@ -237,6 +238,7 @@ namespace WebApplication3.Controllers
                     tonbai.Row = row;
                     tonbai.Tier = tier;
                     tonbai.Truck = null;
+                    tonbai.Position = position;
                     _db.SaveChanges();
 
                     return Json(new { message = "Cập nhật thành công." });
@@ -250,13 +252,14 @@ namespace WebApplication3.Controllers
                 string socont = data["socont"].ToString();
                 string row = data["row"].ToString();
                 string tier = data["tier"].ToString();
-
+                string position = data["position"].ToString();
                 // Cập nhật thông tin
                 var tonbai = _db.Tonbais.Find(socont);
                 if (tonbai != null)
                 {
                     tonbai.Row = row;
                     tonbai.Tier = tier;
+                    tonbai.Position = position;
                     _db.SaveChanges();
 
                     return Json(new { message = "Cập nhật thành công." });
