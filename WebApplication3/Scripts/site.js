@@ -148,10 +148,11 @@ function dropHandler(ev) {
                 return;
             }
 
-        }
+       } 
         let current = tbody.rows[index].cells[colIndex];
-        //console.log('Cell' + cell.innerText)
-        if (localStorage.getItem('item') == cell.innerText) {
+        console.log('Cell' + cell.innerText, localStorage.getItem('item'))
+
+        if (cell.innerText != undefined && localStorage.getItem('item') == cell.innerText) {
             console.log('Invalid')
             return;
         }
@@ -804,19 +805,15 @@ function touchEndHandler(ev) {
             'bay': activeBay,
             'socont': socont
         };
-        //console.log(dataCntr)
         updateMovePosition(dataCntr);
         return;
     }
     //console.log(dropTarget.closest('table').getAttribute('id'))
     if (dropTarget.closest('table').getAttribute('id') == 'myTable') {
-        //console.log('123')
         if (socont == null) {
-            //console.log(dropTarget)
             let socontbyId = currentDraggedElement.getAttribute('data-id').trim();
             dropTarget.innerText = (socontbyId); // Append phần tử vào ô
             currentDraggedElement.style.opacity = '1'; // Khôi phục độ trong suốt
-            //console.log(socontbyId)
             //currentDraggedElement = null; // Reset phần tử đang kéo
             let tr = document.getElementById(socontbyId).closest('tr');
             console.log(tr)
@@ -854,9 +851,7 @@ function touchEndHandler(ev) {
             return;
         }
         //const dropTr = dropTarget.closest('tr');
-        //console.log(socont)
 
-        
         dropTarget.appendChild(currentDraggedElement); // Append phần tử vào ô
         currentDraggedElement.style.opacity = '1'; // Khôi phục độ trong suốt
         
@@ -877,7 +872,6 @@ function touchEndHandler(ev) {
             'socont': socont,
             'position': position
         };
-        console.log(dataCntr)
         // Update position of container
         updatePosition(dataCntr);
     }
@@ -902,7 +896,6 @@ function tabActive2(data) {
             cell.setAttribute('data-row', `${val}`);
             //const item = data[val] && data[val][i];
             //const item = ;
-            //console.log(data[val])
             if (data.length == 0) return;
             data.forEach(item => {
                 
@@ -940,7 +933,6 @@ function tabActive2(data) {
 
                     cell.appendChild(div);
                     const divs = (cell.getElementsByTagName('div'));
-                    //console.log(divs.length)
                     if (item[5][0] == '2' && divs.length == 1) {
                         cell.style.minWidth = '104px';
                         //cell.style.backgroundColor = 'grey';
@@ -955,7 +947,6 @@ function tabActive2(data) {
                         Array.from(divs).forEach((div, index) => {
                             //div.style.width = '50px';
                             //div.style.textOverflow = 'ellipsis';
-                            //console.log(div.getAttribute('data-position'))
                             div.classList.add('align-div');
                             cell.style = '';
                             cell.style.position = 'relative';
@@ -1041,7 +1032,6 @@ function divHover() {
 // Block event
 document.getElementById('blockSelect').addEventListener('change', function () {
     const block = this.value;
-    //console.log(block)
     if (block) {
         // Gọi fetch GET để lấy danh sách bay
         fetch(`/Depot/GetBayByBlock/${block}`)
@@ -1120,8 +1110,6 @@ dropArea.addEventListener('drop', (ev) => {
     //ev.target.appendChild(document.getElementById(data));
     let cont = document.getElementById(data);
     cont.remove();
-    //console.log(data)
-    //dropArea.style.borderColor = '#ccc'; // Khôi phục màu viền
     const blockSelect = document.getElementById('blockSelect');
     const selectedBlock = blockSelect.value;
     const activeElement = document.querySelector('.active');
@@ -1136,7 +1124,6 @@ dropArea.addEventListener('drop', (ev) => {
         'bay': activeBay,
         'socont': data
     };
-    console.log(dataCntr)
     updateMovePosition(dataCntr);
 });
 
@@ -1145,12 +1132,9 @@ const myDiv = document.getElementById('queue');
 const myPopup = document.getElementById('myPopup');
 
 myDiv.addEventListener('click', function (event) {
-    
-
     const blockSelect = document.getElementById('blockSelect');
     const selectedBlock = blockSelect.value;
     const activeElement = document.querySelector('.active');
-
     const activeBay = activeElement.innerText;
     getMoveContainer(selectedBlock, activeBay);
 
@@ -1228,8 +1212,6 @@ function createTruckTable(data) {
     // Populate table body
     data.forEach(item => {
         const row = document.createElement('tr');
-        //console.log(item)
-
         const div = document.createElement('div');
         div.setAttribute('draggable', 'true');
 
@@ -1244,7 +1226,6 @@ function createTruckTable(data) {
         div.setAttribute('data-id', item.SoCont);
         div.setAttribute('data-size', item.KichCo);
         div.innerText = item.SoCont;
-        // If you have another data attribute, uncomment the next line
         // div.setAttribute('data-socont', item[1]);
 
         const cell = document.createElement('td'); // Create a new table cell
