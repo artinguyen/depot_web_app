@@ -153,8 +153,8 @@ img {
             padding: 2px;
             z-index: 1000;
             top: 40px;
-    right: -25px;
-    width: 100px;
+    right: -35px;
+    width: 120px;
         }
 .tk-popup {
             display: none;
@@ -165,7 +165,7 @@ img {
             z-index: 1000;
             top: -50px;
     right: 50px;
-    width: 100px;
+    width: 120px;
         }
 #drop-area {
     position: absolute;

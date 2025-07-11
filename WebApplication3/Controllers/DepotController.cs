@@ -239,6 +239,7 @@ namespace WebApplication3.Controllers
                     tonbai.Tier = tier;
                     tonbai.Truck = null;
                     tonbai.Position = position;
+                    tonbai.Move = null;
                     _db.SaveChanges();
 
                     return Json(new { message = "Cập nhật thành công." });
