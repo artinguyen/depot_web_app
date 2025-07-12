@@ -205,9 +205,12 @@ img {
         }
         .blinking-text {
             text-align: center;
-            margin-top: 20%;
             color: red;
             animation: blink 1s infinite;
+            overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 52px;
         }
 #close, #close-truck {
     position: absolute;

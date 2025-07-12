@@ -20,15 +20,13 @@ function dragstartHandler(ev) {
     const currentCell = target.closest('td');
     const aboveCell = currentCell.parentNode.previousElementSibling
     && currentCell.parentNode.previousElementSibling.children[currentCell.cellIndex];
-
-    localStorage.setItem('item', currentCell.innerText)
-    //console.log(currentCell.parentNode.previousElementSibling)
+    // Set value to item in case move the same column
+    localStorage.setItem('item', currentCell.innerText);
     if (aboveCell && aboveCell.innerText.trim() === '' || aboveCell === undefined || aboveCell == null) {
         ev.dataTransfer.setData("text", target.id);
     } else {
         ev.preventDefault();
     }
-   
 }
 
 function dragoverHandler(ev) {
@@ -36,15 +34,9 @@ function dragoverHandler(ev) {
 }
 
 function dropHandler(ev) {
-    // Lấy tọa độ chuột
     const dropX = ev.clientX;
-    //console.log(dropX)
-    //console.log(ev.target.getBoundingClientRect());
-    //return;
     const xTd = (ev.target.getBoundingClientRect()).x + 25;
-
     let position = '';
-
     ev.preventDefault();
     const table = document.getElementById('myTable');
     const tbody = table.querySelector('tbody');
@@ -68,14 +60,10 @@ function dropHandler(ev) {
         }
         // Not last row, cont-4 move onto cont-2
         if (cell && cell.getElementsByTagName('div').length == 1) {
-            
-
-            //console.log(cell)
             let nextCellInfo = cell.getElementsByTagName('div');
-
             let nextSizeCell = ((cell.getElementsByTagName('div'))[0]).getAttribute('data-size');
-            let currentContainer = ev.dataTransfer.getData("text");
 
+            let currentContainer = ev.dataTransfer.getData("text");
             let currentInfo = document.getElementById(currentContainer);
             if (currentContainer.includes('truck')) {
                 currentInfo = document.getElementById(currentContainer.replace('truck', ''));
@@ -86,11 +74,10 @@ function dropHandler(ev) {
             }
             
             const currentSize = currentInfo.getAttribute('data-size');
-
+            // 
             if (nextCellInfo.length == 1 && nextSizeCell[1] == '2' && currentSize[1] != '2') {
                 return;
             }
-
             // If below is cont2 and the current one is cont2, then skip
             let currentCell = tbody.rows[index].cells[colIndex];
             let currentCellInfo = currentCell.getElementsByTagName('div');
@@ -98,9 +85,7 @@ function dropHandler(ev) {
                 return;
             }
         }
-        //return;
-        // Empty td
-
+        // Cell is empty
         if (!cell) {
             let currentContainer = ev.dataTransfer.getData("text");
             let currentInfo = document.getElementById(currentContainer);
@@ -125,14 +110,10 @@ function dropHandler(ev) {
 
         // Cont-4 move into cont-2
         let currentCell = tbody.rows[index].cells[colIndex];
-        //console.log(currentCell.getElementsByTagName('div').length);
-        //return;
         let currentCellId = '';
         if ((currentCell.getElementsByTagName('div').length == 1)) {
-            
             let currentContainer = ev.dataTransfer.getData("text");
             currentCellId = ((currentCell.getElementsByTagName('div'))[0]).getAttribute('id');
-            console.log('Day la'+currentCellId)
             let currentInfo = document.getElementById(currentContainer);
             if (currentContainer.includes('truck')) {
                 currentInfo = document.getElementById(currentContainer.replace('truck', ''));
@@ -141,19 +122,14 @@ function dropHandler(ev) {
                 currentInfo = document.getElementById(currentContainer.replace('move', ''));
             }
             const currentSize = currentInfo.getAttribute('data-size');
-            //console.log((currentCell.getElementsByTagName('div'))[0])
             let currentSizeCell = ((currentCell.getElementsByTagName('div'))[0]).getAttribute('data-size');
-
             if (currentSizeCell[1] == '2' && currentSize[1] != '2') {
                 return;
             }
+        } 
 
-       } 
         let current = tbody.rows[index].cells[colIndex];
-        console.log('Cell' + cell.innerText, localStorage.getItem('item'))
-
-        if (cell.innerText != undefined && localStorage.getItem('item') == cell.innerText) {
-            console.log('Invalid')
+        if (cell && cell.querySelectorAll('div').length == 1 && cell.innerText != undefined && localStorage.getItem('item') == cell.innerText) {
             return;
         }
         
@@ -163,55 +139,45 @@ function dropHandler(ev) {
             let data = ev.dataTransfer.getData("text");
             const containsMove = data.includes('move'); // Kiểm tra có chứa "move || truck"
             const containsTruck = data.includes('truck');
+            // Move item from move or truck table to myTable
             if (containsMove || containsTruck) {
                 data = data.replace('truck', '');
                 if (containsMove) {
                     data = data.replace('move', '');
                 }
-                const blinkingText = document.createElement('div'); // Tạo một phần tử div mới
-                blinkingText.className = 'blinking-text st-cont'; // Thêm lớp cho div
-                blinkingText.textContent = document.getElementById(data).textContent; // Lấy nội dung từ phần tử khác
-
-                // Thêm phần tử div vào node mục tiêu
-                //ev.target.appendChild(blinkingText);
+                const blinkingText = document.createElement('div');
+                blinkingText.className = 'blinking-text st-cont';
+                blinkingText.textContent = document.getElementById(data).textContent;
                 const _this = ev.target;
-                console.log(_this.getElementsByTagName('div').length)
-                if ((_this.getElementsByTagName('div')).length == 1) {
-                    console.log('Vi tri'+dropX)
-                    if (checkSideCont(currentCellId, dropX) == 'right') {
-                        const firstChild = (ev.target).firstChild;
-                        ev.target.insertBefore(blinkingText, firstChild);
-                        position = 'left';
-                    } else {
-                        //ev.target.appendChild(document.getElementById(data));
-                        ev.target.appendChild(blinkingText);
-                        position = 'right';
-                    }
-                } else if ((_this.getElementsByTagName('div')).length == 0)  {
-              
-                    ev.target.appendChild(blinkingText);
-                    if (dropX < xTd) {
-                        position = 'left';
-                    } else {
-                        position = 'right';
-                    }
-                    //ev.target.appendChild(document.getElementById(data));
+
+                position = 'right';
+                if (dropX < xTd) {
+                    position = 'left';
                 }
 
+                if ((_this.getElementsByTagName('div')).length == 1) {
+                    
+                    if (position == 'left') {
+                        const firstChild = (ev.target).firstChild;
+                        ev.target.insertBefore(blinkingText, firstChild);
+                    } else {
+                        ev.target.appendChild(blinkingText);
+                    }
+                    
+                } else if ((_this.getElementsByTagName('div')).length == 0)  {
+                    ev.target.appendChild(blinkingText);
+                }
+                //return;
                 const row = _this.getAttribute('data-row');
                 const div = this.querySelector('div');
                 //const dataId = div.getAttribute('data-id');
 
                 const socont = data;
-                // Lấy data-tier từ tr cha
                 const tier = _this.closest('tr').getAttribute('data-tier');
                 const blockSelect = document.getElementById('blockSelect');
                 const selectedBlock = blockSelect.value;
                 const activeElement = document.querySelector('.active');
                 let activeBay = activeElement.innerText;
-                if (activeBay[1] == 0) {
-                    activeBay = activeBay[0] + activeBay[2];
-                }
                 const dataCntr = {
                     //'id': dataId,
                     'block': selectedBlock,
@@ -224,37 +190,10 @@ function dropHandler(ev) {
                 // Update position of container
                 updatePosition(dataCntr);
                 document.getElementById(data).parentNode.parentNode.remove();
-            }
-            //if(cell.innerText != cont ) {
-            else {
-                const data = ev.dataTransfer.getData("text");
-                //const offsetX = ev.clientX;
-
-                /*
-                const dropzoneRect = (ev.target).getBoundingClientRect();
-                const offsetX = event.clientX - dropzoneRect.left;
-
-                //console.log(dropzoneRect, offsetX)
-                if (offsetX < dropzoneRect.width / 2) {
-                    const firstChild = (ev.target).firstChild;
-                    ev.target.insertBefore(document.getElementById(data), firstChild)
-                } else {
-                    ev.target.appendChild(document.getElementById(data));
-                }
-                */
-
-               
+            } else {
+                const data = ev.dataTransfer.getData("text");          
                 const _this = ev.target;
                 if ((_this.getElementsByTagName('div')).length == 1) {
-                    /*
-                    if (checkSideCont(currentCellId, dropX) == 'right') {
-                        const firstChild = (ev.target).firstChild;
-                        ev.target.insertBefore(document.getElementById(data), firstChild);
-                        position = 'left';
-                    } else {
-                        ev.target.appendChild(document.getElementById(data));
-                        position = 'right';
-                        */
                     if (dropX < xTd) {
                         const firstChild = (ev.target).firstChild;
                         let obj = document.getElementById(data);
@@ -266,14 +205,10 @@ function dropHandler(ev) {
                         obj.style.float = 'right';
                         ev.target.appendChild(obj);
                         position = 'right';
-                    }
-                  
+                    }        
                 } else if ((_this.getElementsByTagName('div')).length == 0)  {
-                    
-                    //ev.target.appendChild(blinkingText);
                     if (dropX < xTd) {
                         const firstChild = (ev.target).firstChild;
-                        //console.log(firstChild)
                         let obj = document.getElementById(data);
                         obj.style.float = 'left';
                         ev.target.insertBefore(obj, firstChild);
@@ -287,8 +222,6 @@ function dropHandler(ev) {
                 }
                 if ((document.getElementById(data).getAttribute('data-size'))[0] == '2') {
                     ev.target.style.minWidth = '104px';
-                    //cell.style.backgroundColor = 'grey';
-                    //cell.style.textAlign = 'left'
                 }
                 
                 // Find cont
@@ -320,11 +253,8 @@ function dropHandler(ev) {
                 };
                 // Update position of container
                 updatePosition(dataCntr);
-            }
-            
+            }        
         }
-    } else {
-        console.log(4)
     }
 }
 
@@ -432,27 +362,6 @@ function openTab(evt, tabName, tabID) {
     }
     //document.getElementById(tabName).classList.add("active");
     evt.currentTarget.classList.add("active");
-
-    // Declare all variables
-    /*
-    var i, tabcontent, tablinks;
-
-    // Get all elements with class="tabcontent" and hide them
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].classList.remove("active");
-    }
-
-    // Get all elements with class="tablinks" and remove the class "active"
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].classList.remove("active");
-    }
-/*
-    // Show the current tab, and add an "active" class to the button that opened the tab
-    document.getElementById(tabName).classList.add("active");
-    evt.currentTarget.classList.add("active");
-*/
     // Get data
     const blockSelect = document.getElementById('blockSelect');
     const selectedBlock = blockSelect.value;
@@ -475,11 +384,6 @@ function tabActive(data) {
         row.setAttribute('data-tier', i);
         row_numbers.forEach((val) => {
             const cell = document.createElement('td');
-            /*
-            cell.setAttribute('data-row', `${val}${i}`);
-            const key = `${val}${i}`;
-            const item = data[key] && data[key][i];
-            */
             cell.setAttribute('data-row', `${val}`);
             const item = data[val] && data[val][i];
             if (item) {
@@ -545,19 +449,14 @@ function touchStartHandler(ev) {
             return;
         }
         // else
-        img.style.opacity = '0.5'; // Giảm độ trong suốt khi kéo
-        currentDraggedElement = img; // Lưu phần tử đang kéo
+        img.style.opacity = '0.5';
+        currentDraggedElement = img;
         localStorage.setItem('item', currentDraggedElement.innerText)
     }
 }
 
 function touchMoveHandler(ev) {
-    //const touchY = e.touches[0].clientY;
-
-    //const dropTarget = document.elementFromPoint(e.changedTouches[0].clientX, touchY);
-    //console.log(dropTarget)
-
-    if (!currentDraggedElement) return; // Nếu không có phần tử nào đang được kéo
+    if (!currentDraggedElement) return;
     const touch = ev.touches[0];
 }
 
@@ -565,14 +464,15 @@ function touchMoveHandler(ev) {
 function touchStartHandlerMove(ev) {
     const touch = ev.touches[0];
     const img = ev.target;
-    img.dataset.startX = touch.clientX - img.offsetLeft; // Tính toán vị trí bắt đầu
+    img.dataset.startX = touch.clientX - img.offsetLeft;
     img.dataset.startY = touch.clientY - img.offsetTop;
-    img.style.opacity = '0.5'; // Giảm độ trong suốt khi kéo
-    currentDraggedElement = img; // Lưu phần tử đang kéo
+    img.style.opacity = '0.5';
+    currentDraggedElement = img;
+    localStorage.removeItem('item');
 }
 
 function touchMoveHandlerMove(ev) {
-    if (!currentDraggedElement) return; // Nếu không có phần tử nào đang được kéo
+    if (!currentDraggedElement) return;
     const touch = ev.touches[0];
 }
 
@@ -580,92 +480,64 @@ function touchMoveHandlerMove(ev) {
 function touchStartHandlerTruck(ev) {
     const touch = ev.touches[0];
     const img = ev.target;
-    img.dataset.startX = touch.clientX - img.offsetLeft; // Tính toán vị trí bắt đầu
+    img.dataset.startX = touch.clientX - img.offsetLeft;
     img.dataset.startY = touch.clientY - img.offsetTop;
-    img.style.opacity = '0.5'; // Giảm độ trong suốt khi kéo
-    currentDraggedElement = img; // Lưu phần tử đang kéo
+    img.style.opacity = '0.5';
+    currentDraggedElement = img;
+    localStorage.removeItem('item');
 }
 
 function touchMoveHandlerTruck(ev) {
-    if (!currentDraggedElement) return; // Nếu không có phần tử nào đang được kéo
+    if (!currentDraggedElement) return;
     const touch = ev.touches[0];
 }
 
 function touchEndHandlerMove(ev) {
-    // Kiểm tra vị trí thả và gọi dropHandler
     const dropTarget = document.elementFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
-
     const socont = currentDraggedElement.getAttribute('data-id').trim();
-    //console.log('234')
-    //return;
     if (dropTarget.getAttribute('id') == 'truck') {
-        //console.log(dropTarget.getAttribute('id'))
-        //(document.getElementById(socont)).closest('tr').remove();
-        //console.log(document.getElementById(socont))
-        //dropTarget.appendChild(currentDraggedElement);
         let tr = document.getElementById(socont).closest('tr');
-        //console.log(tr)
-        //currentDraggedElement = null;
         if (tr.remove()) {
             currentDraggedElement = null;
         }
-        //return;
+
         const blockSelect = document.getElementById('blockSelect');
         const selectedBlock = blockSelect.value;
         const activeElement = document.querySelector('.active');
 
         let activeBay = activeElement.innerText;
-        if (activeBay[1] == 0) {
-            activeBay = activeBay[0] + activeBay[2];
-        }
-
         const dataCntr = {
             //'id': dataId,
             'block': selectedBlock,
             'bay': activeBay,
             'socont': socont
         };
-        //console.log(dataCntr)
         updateTruckPosition(dataCntr);
         return;
     }
 }
 
 function touchEndHandlerTruck(ev) {
-    // Kiểm tra vị trí thả và gọi dropHandler
     const dropTarget = document.elementFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
-
     const socont = currentDraggedElement.getAttribute('data-id');
-    console.log('123')
-    //return;
+
     if (dropTarget.getAttribute('id') == 'truck') {
-        //console.log(dropTarget.getAttribute('id'))
-        //(document.getElementById(socont)).closest('tr').remove();
-        //console.log(document.getElementById(socont))
-        //dropTarget.appendChild(currentDraggedElement);
         let tr = document.getElementById(socont).closest('tr');
-        //console.log(tr)
-        //currentDraggedElement = null;
         if (tr.remove()) {
             currentDraggedElement = null;
         }
-        //return;
+
         const blockSelect = document.getElementById('blockSelect');
         const selectedBlock = blockSelect.value;
         const activeElement = document.querySelector('.active');
 
         let activeBay = activeElement.innerText;
-        if (activeBay[1] == 0) {
-            activeBay = activeBay[0] + activeBay[2];
-        }
-
         const dataCntr = {
             //'id': dataId,
             'block': selectedBlock,
             'bay': activeBay,
             'socont': socont
         };
-        //console.log(dataCntr)
         updateTruckPosition(dataCntr);
         return;
     }
@@ -673,70 +545,49 @@ function touchEndHandlerTruck(ev) {
 
 
 function touchEndHandler(ev) {
-    // Lấy tọa độ chuột
-    const touch = ev.changedTouches[0]; // Lấy touch đầu tiên
-    const dropX = touch.clientX; // Lấy tọa độ X
-    
-
-    //const dropTarget = document.elementFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
-    //console.log(dropTarget.getBoundingClientRect());
-    //console.log(ev)
-    //const touch = ev.changedTouches[0];
-    //const dropX = touch.clientX;
+    const touch = ev.changedTouches[0];
+    const dropX = touch.clientX;
     const dropY = touch.clientY;
-    //const dropTarget = document.elementFromPoint(dropX, dropY);
-    // Lấy phần tử tại tọa độ đó
     const dropTarget1 = document.elementFromPoint(dropX, dropY);
     const rect = dropTarget1.getBoundingClientRect();
-                const xTd = rect.left + 25;
-    //console.log(dropX, left);
-
-
-    //return;
-    //const xTd = (ev.target.getBoundingClientRect()).x + 25;
-
+    const xTd = rect.left + 25;
     let position = '';
-
-
-    // Kiểm tra vị trí thả và gọi dropHandler
     const dropTarget = document.elementFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
-       //console.log(dropTarget)
-
     const aboveCell = dropTarget.parentNode.previousElementSibling
     && dropTarget.parentNode.previousElementSibling.children[dropTarget.cellIndex];
 
     const belowCell = dropTarget.parentNode.nextElementSibling
     && dropTarget.parentNode.nextElementSibling.children[dropTarget.cellIndex];
 
-    //console.log(dropTarget.closest('td').querySelectorAll('div').length)
-    //return;
-    if ((dropTarget.closest('td').querySelectorAll('div')).length = 1) {
-        const existDiv = dropTarget.closest('td').querySelectorAll('div');
-        //console.log(existDiv)
-        if ((currentDraggedElement.getAttribute('data-size'))[0] != 2 && existDiv.length > 0 && (existDiv[0].getAttribute('data-size'))[0] == 2) {
-            currentDraggedElement.style.opacity = '1';
-            return;
+    let dropTargetId = null;
+    let closestTable = dropTarget.closest('table');
+    if (closestTable instanceof HTMLElement && closestTable.getAttribute('id') == 'myTable') {
+        // Drop target is myTable
+        // Move cont4 to cont2
+        if ((dropTarget.closest('td').querySelectorAll('div')).length == 1) {
+            const existDiv = dropTarget.closest('td').querySelectorAll('div');
+            if ((currentDraggedElement.getAttribute('data-size'))[0] != 2 && existDiv.length > 0 && (existDiv[0].getAttribute('data-size'))[0] == 2) {
+                currentDraggedElement.style.opacity = '1';
+                return;
+            }
+            if (existDiv.length > 0 && (existDiv[0].getAttribute('data-size'))[0] != 2) {
+                currentDraggedElement.style.opacity = '1';
+                return;
+            }
         }
-        if (existDiv.length > 0 && (existDiv[0].getAttribute('data-size'))[0] != 2) {
-            currentDraggedElement.style.opacity = '1';
-            return;
+
+        // Move cont4 to cont2
+        if ((dropTargetId != 'truck' || dropTargetId != 'move') && (dropTarget.closest('td').querySelectorAll('div')).length == 0 && belowCell != undefined) {
+            //console.log('123');
+            //return;
+            let existDiv = belowCell.querySelectorAll('div');
+            if (existDiv.length == 1 && (existDiv[0].getAttribute('data-size'))[0] == 2 && (currentDraggedElement.getAttribute('data-size'))[0] != 2) {
+                currentDraggedElement.style.opacity = '1';
+                return;
+            }
         }
     }
-
-    if ((dropTarget.closest('td').querySelectorAll('div')).length == 0 && belowCell != undefined) {
-        //console.log('123');
-        //return;
-        let existDiv = belowCell.querySelectorAll('div');
-        if (existDiv.length == 1 && (existDiv[0].getAttribute('data-size'))[0] == 2 && (currentDraggedElement.getAttribute('data-size'))[0] != 2) {
-            currentDraggedElement.style.opacity = '1';
-            return;
-        }
-    }
-
-    //console.log(aboveCell)
-    //localStorage.setItem('item', currentCell.innerText)
-    //console.log(aboveCell.innerText.trim(), belowCell.innerText.trim());
-
+    
     // If above and below cell are empty
     if (aboveCell && aboveCell.innerText.trim() == '' && belowCell && belowCell.innerText.trim() == '') {
         currentDraggedElement.style.opacity = '1';
@@ -749,94 +600,107 @@ function touchEndHandler(ev) {
     }
 
     if (belowCell && localStorage.getItem('item') == belowCell.innerText.trim()) {
+        console.log('4')
         currentDraggedElement.style.opacity = '1';
         return;
     }
 
-
-    const socont = currentDraggedElement.getAttribute('data-socont');
+    // Object is clicked but not move, currentDragged, dropTarget are the same
+    if (!currentDraggedElement || currentDraggedElement == dropTarget) {
+        currentDraggedElement.style.opacity = '1';
+        console.log(2)
+        return;
+    }
+    let socont = currentDraggedElement.getAttribute('data-socont');
    
     if (dropTarget.classList[1] == 'body-content') {
         currentDraggedElement.style.opacity = '1';
         return;
     }
-    
+
     if (dropTarget.getAttribute('id') == 'truck') {
-        console.log(dropTarget.getAttribute('id'))
-        dropTarget.appendChild(currentDraggedElement);
-        currentDraggedElement = null;
-
-        const blockSelect = document.getElementById('blockSelect');
-        const selectedBlock = blockSelect.value;
-        const activeElement = document.querySelector('.active');
-
-        let activeBay = activeElement.innerText;
-        if (activeBay[1] == 0) {
-            activeBay = activeBay[0] + activeBay[2];
-        }
-
-        const dataCntr = {
-            //'id': dataId,
-            'block': selectedBlock,
-            'bay': activeBay,
-            'socont': socont
-        };
-        //console.log(dataCntr)
-        updateTruckPosition(dataCntr);
-        return;
-    }
-
-    if (dropTarget.getAttribute('id') == 'queue') {
-        dropTarget.appendChild(currentDraggedElement);
-        currentDraggedElement = null;
-
-        const blockSelect = document.getElementById('blockSelect');
-        const selectedBlock = blockSelect.value;
-        const activeElement = document.querySelector('.active');
-
-        let activeBay = activeElement.innerText;
-        if (activeBay[1] == 0) {
-            activeBay = activeBay[0] + activeBay[2];
-        }
-
-        const dataCntr = {
-            //'id': dataId,
-            'block': selectedBlock,
-            'bay': activeBay,
-            'socont': socont
-        };
-        updateMovePosition(dataCntr);
-        return;
-    }
-    //console.log(dropTarget.closest('table').getAttribute('id'))
-    if (dropTarget.closest('table').getAttribute('id') == 'myTable') {
+        //dropTarget.appendChild(currentDraggedElement);
         if (socont == null) {
-            let socontbyId = currentDraggedElement.getAttribute('data-id').trim();
-            dropTarget.innerText = (socontbyId); // Append phần tử vào ô
-            currentDraggedElement.style.opacity = '1'; // Khôi phục độ trong suốt
-            //currentDraggedElement = null; // Reset phần tử đang kéo
-            let tr = document.getElementById(socontbyId).closest('tr');
-            console.log(tr)
-            //currentDraggedElement = null;
+            socont = currentDraggedElement.getAttribute('id').trim();
+            let tr = document.getElementById(socont).closest('tr');
             if (tr.remove()) {
                 currentDraggedElement = null;
             }
-            const row = dropTarget.getAttribute('data-row');
-            //socont = div.getAttribute('data-socont');
-            const tier = dropTarget.closest('tr').getAttribute('data-tier');
+        }
 
+        currentDraggedElement = null;
+        let info = getSelectedBlockAndBay();
+        const dataCntr = {
+            //'id': dataId,
+            'block': info.selectedBlock,
+            'bay': info.activeBay,
+            'socont': socont
+        };
+        updateTruckPosition(dataCntr);
+        // Delete div
+        dropTarget.querySelectorAll('div').forEach(div => {
+            div.remove(); // Xóa từng div
+        });
+        return;
+    }
+
+    // Drop item from table to moving location
+    if (dropTarget.getAttribute('id') == 'move') {
+        //dropTarget.appendChild(currentDraggedElement);
+        if (socont == null) {
+            socont = currentDraggedElement.getAttribute('id').trim();
+            let tr = document.getElementById(socont).closest('tr');
+            if (tr.remove()) {
+                currentDraggedElement = null;
+            }
+        }
+
+        currentDraggedElement = null;
+        let info = getSelectedBlockAndBay();
+        const dataCntr = {
+            //'id': dataId,
+            'block': info.selectedBlock,
+            'bay': info.activeBay,
+            'socont': socont
+        };
+        updateMovePosition(dataCntr);
+        dropTarget.querySelectorAll('div').forEach(div => {
+            div.remove(); // Xóa từng div
+        })
+        return;
+    }
+    
+    let currentDraggedElement_temp = currentDraggedElement;
+    currentDraggedElement = null;
+
+    if (dropTarget.closest('table').getAttribute('id') == 'myTable') {
+        if (socont == null) {
+            let socontbyId = currentDraggedElement_temp.getAttribute('id').trim();
+            let tr = document.getElementById(socontbyId).closest('tr');
+            if (tr.remove()) {
+                currentDraggedElement = null;
+            }
+
+            const row = dropTarget.getAttribute('data-row');
+            const tier = dropTarget.closest('tr').getAttribute('data-tier');
             const blockSelect = document.getElementById('blockSelect');
             const selectedBlock = blockSelect.value;
             const activeElement = document.querySelector('.active');
             let activeBay = activeElement.innerText;
-            if (activeBay[1] == 0) {
-                activeBay = activeBay[0] + activeBay[2];
-            }
+            
             if (dropX < xTd) {
+                const firstChild = (dropTarget).firstChild;
+                currentDraggedElement_temp.style.float = 'left';
+                currentDraggedElement_temp.className = 'blinking-text st-cont';
+                dropTarget.insertBefore(currentDraggedElement_temp, firstChild);
                 position = 'left';
             } else {
+                currentDraggedElement_temp.style.float = 'right';
+                currentDraggedElement_temp.className = 'blinking-text st-cont';
+                dropTarget.appendChild(currentDraggedElement_temp);
                 position = 'right';
             }
+
             const dataCntr = {
                 //'id': dataId,
                 'block': selectedBlock,
@@ -850,21 +714,21 @@ function touchEndHandler(ev) {
             updatePosition(dataCntr);
             return;
         }
-        //const dropTr = dropTarget.closest('tr');
 
-        dropTarget.appendChild(currentDraggedElement); // Append phần tử vào ô
-        currentDraggedElement.style.opacity = '1'; // Khôi phục độ trong suốt
-        
-        currentDraggedElement = null; // Reset phần tử đang kéo
-
-        const row = dropTarget.getAttribute('data-row');
-        //socont = div.getAttribute('data-socont');
-        const tier = dropTarget.closest('tr').getAttribute('data-tier');
         if (dropX < xTd) {
+            const firstChild = (dropTarget).firstChild;
+            currentDraggedElement_temp.style.float = 'left';
+            dropTarget.insertBefore(currentDraggedElement_temp, firstChild);
             position = 'left';
         } else {
+            currentDraggedElement_temp.style.float = 'right';
+            dropTarget.appendChild(currentDraggedElement_temp);
             position = 'right';
         }
+
+        const row = dropTarget.getAttribute('data-row');
+        const tier = dropTarget.closest('tr').getAttribute('data-tier');
+        
         const dataCntr = {
             //'id': dataId,
             'row': row,
@@ -874,6 +738,7 @@ function touchEndHandler(ev) {
         };
         // Update position of container
         updatePosition(dataCntr);
+        currentDraggedElement_temp = null;
     }
 }
 
@@ -885,34 +750,20 @@ function tabActive2(data) {
 
     for (let i = 5; i >= 1; i--) {
         const row = document.createElement('tr');
-        row.setAttribute('data-tier', i);
+        row.setAttribute('data-tier', i < 10 ? '0' + i : i);
         row_numbers.forEach((val) => {
             const cell = document.createElement('td');
-            /*
-            cell.setAttribute('data-row', `${val}${i}`);
-            const key = `${val}${i}`;
-            const item = data[key] && data[key][i];
-            */
-            cell.setAttribute('data-row', `${val}`);
-            //const item = data[val] && data[val][i];
-            //const item = ;
+            cell.setAttribute('data-row', `${val < 10 ? '0' + val : val}`);
             if (data.length == 0) return;
             data.forEach(item => {
-                
-                //row[0], // null
-                   // removeWhitespace(row[1]),
                 if(removeWhitespace(item[2]) == val && removeWhitespace(item[3]) == i) {
                     const div = document.createElement('div');
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', 'dragstartHandler(event)');
-
                     div.addEventListener('touchstart', touchStartHandler);
                     div.addEventListener('touchmove', touchMoveHandler);
                     div.addEventListener('touchend', touchEndHandler);
-
-
                     div.setAttribute('id', item[1]);
-
                     div.className = 'st-cont';
                     div.setAttribute('data-id', item[0]);
                     div.setAttribute('data-socont', item[1]);
@@ -946,65 +797,21 @@ function tabActive2(data) {
                     if (item[5][0] == '2' && divs.length == 2) {
                         Array.from(divs).forEach((div, index) => {
                             //div.style.width = '50px';
-                            //div.style.textOverflow = 'ellipsis';
                             div.classList.add('align-div');
                             cell.style = '';
                             cell.style.position = 'relative';
-                            /*
-                            console.log('Vi tri' + div.getAttribute('data-position'))
-                            if (div.getAttribute('data-position') == 'right') {
-                                div.style.float = 'right';
-                            } else {
-                                div.style.float = 'left';
-                            }
-                            */
                             div.style.float = div.getAttribute('data-position');
 
                         });
                     }
                 }
-                
-                    //row[4],
-                    //removeWhitespace(row[5]);
-
             });
-            
-            
-
-            if (i == '12345') {
-                const div = document.createElement('div');
-                div.setAttribute('draggable', 'true');
-                div.setAttribute('ondragstart', 'dragstartHandler(event)');
-                div.setAttribute('id', item[1]);
-                //div.className = 'st-cont tooltip';
-                div.className = 'st-cont';
-                div.setAttribute('data-id', item[0]);
-                div.setAttribute('data-socont', item[1]);
-                if (lineColor[item[4]]) {
-                    div.style.backgroundColor = '#' + lineColor[item[4]];
-                }
-                if (item[5][1] != '2') {
-                    div.style.width = '';
-                }
-
-                const spanText = document.createElement('span');
-                spanText.className = 'text';
-                spanText.textContent = item[1];
-                /*
-                const spanTooltip = document.createElement('span');
-                spanTooltip.className = 'tooltiptext';
-                spanTooltip.textContent = item[1];
-                */
-                div.appendChild(spanText);
-                //div.appendChild(spanTooltip);
-                cell.appendChild(div);
-            }
 
             row.appendChild(cell);
         });
-        //return;
         tableBody.appendChild(row);
     }
+
     // Initial previous events
     init();
     divHover();
@@ -1071,45 +878,30 @@ document.getElementById('blockSelect').addEventListener('change', function () {
 
 setInterval(function () {
     const activeButton = document.querySelector('.tablinks.active');
-
     if (activeButton) {
         activeButton.click();
     }
-}
-    , 2000);
+}, 2000);
 
 setInterval(function () {
-    const blockSelect = document.getElementById('blockSelect');
-    const selectedBlock = blockSelect.value;
-    const activeElement = document.querySelector('.active');
-
-    let activeBay = activeElement.innerText;
-    if (activeBay[1] == 0) {
-        activeBay = activeBay[0] + activeBay[2];
-    }
-    getMoveContainer(selectedBlock, activeBay);
-    getTruckContainer(selectedBlock, activeBay);
+    let info = getSelectedBlockAndBay();
+    getMoveContainer(info.selectedBlock, info.activeBay);
+    getTruckContainer(info.selectedBlock, info.activeBay);
 
 }, 2000);
 
-// Container
+// Moving Area
 const dropArea = document.getElementById('drop-area');
-//const img = document.getElementById('image');
-
-// Ngăn chặn hành động mặc định
 dropArea.addEventListener('dragover', (event) => {
     event.preventDefault();
-    dropArea.style.borderColor = 'green'; // Thay đổi màu viền khi kéo vào
 });
 
-// Khôi phục màu viền khi không còn kéo vào
-// Xử lý sự kiện drop
 dropArea.addEventListener('drop', (ev) => {
     event.preventDefault();
     const data = ev.dataTransfer.getData("text");
-    //ev.target.appendChild(document.getElementById(data));
     let cont = document.getElementById(data);
     cont.remove();
+    /*
     const blockSelect = document.getElementById('blockSelect');
     const selectedBlock = blockSelect.value;
     const activeElement = document.querySelector('.active');
@@ -1118,36 +910,30 @@ dropArea.addEventListener('drop', (ev) => {
     if (activeBay[1] == 0) {
         activeBay = activeBay[0] + activeBay[2];
     }
+    */
+    let info = getSelectedBlockAndBay();
     const dataCntr = {
         //'id': dataId,
-        'block': selectedBlock,
-        'bay': activeBay,
+        'block': info.selectedBlock,
+        'bay': info.activeBay,
         'socont': data
     };
     updateMovePosition(dataCntr);
 });
 
-// Popup
-const myDiv = document.getElementById('queue');
+// Moving popup
+const moveArea = document.getElementById('move');
 const myPopup = document.getElementById('myPopup');
-
-myDiv.addEventListener('click', function (event) {
-    const blockSelect = document.getElementById('blockSelect');
-    const selectedBlock = blockSelect.value;
-    const activeElement = document.querySelector('.active');
-    const activeBay = activeElement.innerText;
-    getMoveContainer(selectedBlock, activeBay);
-
-
-    const rect = myDiv.getBoundingClientRect();
-
+moveArea.addEventListener('click', function (event) {
+    let info = getSelectedBlockAndBay();
+    getMoveContainer(info.selectedBlock, info.activeBay);
+    const rect = moveArea.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    myPopup.style.display = 'block'; // Hiện popup
+    myPopup.style.display = 'block';
 });
 
-
-// Get position of containers
+// Get position of moving containers
 function getMoveContainer(block, bay) {
     fetch(`/Depot/GetMoveContainer/${block}/${bay}`, {
         method: 'GET'
@@ -1167,7 +953,7 @@ function getMoveContainer(block, bay) {
     });
 }
 
-// Get position of containers
+// Get position of truck containers
 function getTruckContainer(block, bay) {
     fetch(`/Depot/GetTruckContainer/${block}/${bay}`, {
         method: 'GET'
@@ -1179,26 +965,24 @@ function getTruckContainer(block, bay) {
         return response.json();
     })
     .then(data => {
-        createTruckTable(data)
-        //render(data);
+        createTruckTable(data);
     })
     .catch(error => {
         console.error("Error:", error);
     });
 }
 
+// Create table for truck area
 function createTruckTable(data) {
     const tableContainer = document.getElementById('tableTruck');
-    tableContainer.innerHTML = '';
-    // Create a table element
     const table = document.createElement('table');
-    table.setAttribute('id', 'truck-table');
     const thead = document.createElement('thead');
     const tbody = document.createElement('tbody');
-
-    // Create table header
     const headerRow = document.createElement('tr');
     const headers = ['Số cont'];
+
+    tableContainer.innerHTML = '';
+    table.setAttribute('id', 'truck-table');
 
     headers.forEach(headerText => {
         const th = document.createElement('th');
@@ -1209,32 +993,27 @@ function createTruckTable(data) {
     thead.appendChild(headerRow);
     table.appendChild(thead);
     if(data.length > 0) {
-    // Populate table body
-    data.forEach(item => {
-        const row = document.createElement('tr');
-        const div = document.createElement('div');
-        div.setAttribute('draggable', 'true');
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            const div = document.createElement('div');
+            div.setAttribute('draggable', 'true');
+            // Add dragstart event listener
+            div.addEventListener('dragstart', dragstartHandlerTruckCont);
+            // For mobile event
+            div.addEventListener('touchstart', touchStartHandlerTruck);
+            div.addEventListener('touchmove', touchMoveHandlerTruck);
+            div.addEventListener('touchend', touchEndHandler);
+            //div.setAttribute('ondragstart', 'dragstartHandler(event)');
+            div.setAttribute('id', item.SoCont.trim());
+            div.setAttribute('data-id', item.SoCont);
+            div.setAttribute('data-size', item.KichCo);
+            div.innerText = item.SoCont;
 
-        // Add dragstart event listener
-        div.addEventListener('dragstart', dragstartHandlerTruckCont);
-        div.addEventListener('touchstart', touchStartHandlerTruck);
-        div.addEventListener('touchmove', touchMoveHandlerTruck);
-        div.addEventListener('touchend', touchEndHandler);
-        //div.setAttribute('ondragstart', 'dragstartHandler(event)');
-        div.setAttribute('id', item.SoCont.trim());
-        //div.className = 'st-cont';
-        div.setAttribute('data-id', item.SoCont);
-        div.setAttribute('data-size', item.KichCo);
-        div.innerText = item.SoCont;
-        // div.setAttribute('data-socont', item[1]);
-
-        const cell = document.createElement('td'); // Create a new table cell
-        cell.appendChild(div); // Append the div to the cell
-
-        row.appendChild(cell); // Append the cell to the row
-
-        tbody.appendChild(row);
-    });
+            const cell = document.createElement('td');
+            cell.appendChild(div);
+            row.appendChild(cell);
+            tbody.appendChild(row);
+        });
     } else {
         tbody.innerHTML = '<tr><td>Không có dữ liệu </td></tr>';
     }
@@ -1243,19 +1022,16 @@ function createTruckTable(data) {
 }
 
 
-// Function to create and populate the table
+// Function to create table for moving area
 function createTable(data) {
     const tableContainer = document.getElementById('tableContainer');
-    tableContainer.innerHTML = '';
-    // Create a table element
     const table = document.createElement('table');
-    table.setAttribute('id', 'move-table');
     const thead = document.createElement('thead');
     const tbody = document.createElement('tbody');
-
-    // Create table header
     const headerRow = document.createElement('tr');
     const headers = ['Số cont'];
+    tableContainer.innerHTML = '';
+    table.setAttribute('id', 'move-table');
 
     headers.forEach(headerText => {
         const th = document.createElement('th');
@@ -1266,40 +1042,28 @@ function createTable(data) {
     thead.appendChild(headerRow);
     table.appendChild(thead);
     if(data.length > 0) {
-    // Populate table body
-    data.forEach(item => {
-        const row = document.createElement('tr');
-        //console.log(item)
-  
-        const div = document.createElement('div');
-        div.setAttribute('draggable', 'true');
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            const div = document.createElement('div');
+            div.setAttribute('draggable', 'true');
+            // Add dragstart event listener
+            div.addEventListener('dragstart', dragstartHandlerMoveCont);
+            // For mobile event
+            div.addEventListener('touchstart', touchStartHandlerMove);
+            div.addEventListener('touchmove', touchMoveHandlerMove);
+            div.addEventListener('touchend', touchEndHandler);
+            //div.setAttribute('ondragstart', 'dragstartHandler(event)');
+            div.setAttribute('id', item.SoCont.trim());
+            div.setAttribute('data-id', item.SoCont);
+            div.setAttribute('data-size', item.KichCo);
+            div.innerText = item.SoCont;
 
-        // Add dragstart event listener
-        div.addEventListener('dragstart', dragstartHandlerMoveCont);
-
-        div.addEventListener('touchstart', touchStartHandlerMove);
-        div.addEventListener('touchmove', touchMoveHandlerMove);
-        div.addEventListener('touchend', touchEndHandlerMove);
-
-
-        //div.setAttribute('ondragstart', 'dragstartHandler(event)');
-        div.setAttribute('id', item.SoCont.trim());
-        //div.className = 'st-cont';
-        div.setAttribute('data-id', item.SoCont);
-        div.setAttribute('data-size', item.KichCo);
-        div.innerText = item.SoCont;
-        // If you have another data attribute, uncomment the next line
-        // div.setAttribute('data-socont', item[1]);
-
-        const cell = document.createElement('td'); // Create a new table cell
-        cell.appendChild(div); // Append the div to the cell
-
-        row.appendChild(cell); // Append the cell to the row
-
-        tbody.appendChild(row);
-    });
-    }
-    else {
+            const cell = document.createElement('td');
+            cell.appendChild(div);
+            row.appendChild(cell);
+            tbody.appendChild(row);
+        });
+    } else {
         tbody.innerHTML = '<tr><td>Không có dữ liệu </td></tr>';
     }
     table.appendChild(tbody);
@@ -1316,49 +1080,43 @@ function dragstartHandlerTruckCont(event) {
     event.dataTransfer.setData('text', 'truck' + event.target.id);
 }
 
-// Close popup
+// Close moving popup
 const closePopup = document.getElementById('close');
-
 closePopup.addEventListener('click', function (event) {
     myPopup.style.display = 'none';
 })
 
+/*
+// Truck area
+*/
+// Close truck popup
 const closeTruckPopup = document.getElementById('close-truck');
-
 closeTruckPopup.addEventListener('click', function (event) {
     truckPopup.style.display = 'none';
 })
 
-
-
 const truckArea = document.getElementById('truck-area');
-//const img = document.getElementById('image');
-
-// Ngăn chặn hành động mặc định
 truckArea.addEventListener('dragover', (event) => {
     event.preventDefault();
-    dropArea.style.borderColor = 'green'; // Thay đổi màu viền khi kéo vào
 });
 
+// Move item from container table and moving table to truck area
 truckArea.addEventListener('drop', (ev) => {
     event.preventDefault();
     let data = ev.dataTransfer.getData("text");
-    const containsMove = data.includes('move'); // Kiểm tra có chứa "move || truck"
+    const containsMove = data.includes('move');
     let isMove = false;
     if (containsMove) {
         data = data.replace('move', '');
         isMove = true;
     }
-    //ev.target.appendChild(document.getElementById(data));
-    //let cont = document.getElementById(data);
-    //cont.remove();
+
     if (isMove) {
         document.getElementById(data).parentNode.parentNode.remove();
     } else {
         document.getElementById(data).remove();
     }
     
-    //dropArea.style.borderColor = '#ccc'; // Khôi phục màu viền
     const blockSelect = document.getElementById('blockSelect');
     const selectedBlock = blockSelect.value;
     const activeElement = document.querySelector('.active');
@@ -1382,27 +1140,26 @@ truckArea.addEventListener('drop', (ev) => {
 const truckDiv = document.getElementById('truck');
 const truckPopup = document.getElementById('truckPopup');
 
+// Show popup when click on truck image
 truckDiv.addEventListener('click', function (event) {
-    
+    getTruckContainer(getSelectedBlockAndBay().selectedBlock, getSelectedBlockAndBay().activeBay);
+    const rect = truckDiv.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    truckPopup.style.display = 'block';
+});
 
+function getSelectedBlockAndBay() {
     const blockSelect = document.getElementById('blockSelect');
     const selectedBlock = blockSelect.value;
     const activeElement = document.querySelector('.active');
+    const activeBay = activeElement ? activeElement.innerText : null;
 
-    const activeBay = activeElement.innerText;
-    getTruckContainer(selectedBlock, activeBay);
-
-
-    const rect = myDiv.getBoundingClientRect();
-
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    //myPopup.style.top = `${y + 100}px`; // Vị trí bên dưới div
-    //myPopup.style.right = `${x * 2}px`;
-    truckPopup.style.display = 'block'; // Hiện popup
-});
-
+    return {
+        selectedBlock: selectedBlock,
+        activeBay: activeBay
+    };
+}
 
 // Check side of container
 function checkSideCont(cont1Id, cont2Id) {
@@ -1424,36 +1181,25 @@ function checkSideCont(cont1Id, cont2Id) {
 
 
 function checkMediaQuery() {
-    
     const mediaQuery = window.matchMedia('(max-width: 1180px)');
     const divs = document.querySelectorAll('#myTable div');
     
     if (mediaQuery.matches) {
-        //document.querySelector('.message').textContent = 'Màn hình nhỏ hơn hoặc bằng 1024px.';
-        
-        //console.log(divs)
-        // Lặp qua từng div và thực hiện hành động
         divs.forEach(div => {
-            
             if ((div.getAttribute('data-size'))[0] == '2') {
-                
                 div.style.width = '25px';
             }
-            //console.log(div.textContent); // Hoặc thực hiện hành động khác
         });
     } else {
         divs.forEach(div => {
             if ((div.getAttribute('data-size'))[0] == '2') {
                 div.style.width = '';
             }
-            //console.log(div.textContent); // Hoặc thực hiện hành động khác
         });
-        //document.querySelector('.message').textContent = 'Màn hình lớn hơn 1024px.';
     }
 }
 
 // Kiểm tra ngay khi tải trang
 checkMediaQuery();
-
 // Thêm sự kiện lắng nghe thay đổi kích thước màn hình
 window.addEventListener('resize', checkMediaQuery);

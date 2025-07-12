@@ -12,9 +12,8 @@
 </div>
 
 <div id="drop-area">
-    <img src="~/Content/Images/container.png" alt="Description of image" id="queue" />
+    <img src="~/Content/Images/container.png" alt="Description of image" id="move" />
     <div class="container-popup">
-
         <div class="popup" id="myPopup"><span id="close">X</span><div id="tableContainer"></div></div>
     </div>
 </div>
@@ -24,7 +23,7 @@
     @foreach (var bay in Model.Bays)
     {
         string formattedBay = bay.Length == 2 ? $"{bay[0]}0{bay[1]}" : bay;
-        <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay')">@formattedBay</button>
+        <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay')">@bay</button>
     }
 </div>
 
