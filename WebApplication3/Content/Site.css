@@ -1,6 +1,6 @@
 ﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
+    #padding-top: 50px;
+    #padding-bottom: 20px;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -94,6 +94,7 @@ th {
     display: flex;
     margin-left: 52px;
     margin-bottom: 5px;
+    margin-top: 20px;
 }
 .tab button {
     background-color: #f1f1f1;
@@ -138,6 +139,8 @@ th {
 }
 #blockSelect{
     width: auto;
+    display: inline-block;
+    cursor: pointer;
 }
 img {
     width: 50px;
@@ -146,16 +149,16 @@ img {
 
 /* Popup */
 .popup {
-            display: none;
-            position: absolute;
-            background-color: white;
-            border: 1px solid #ccc;
-            padding: 2px;
-            z-index: 1000;
-            top: 40px;
-    right: -35px;
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 2px;
+    z-index: 1000;
+    top: 40px;
+    right: 65px;
     width: 120px;
-        }
+}
 .tk-popup {
             display: none;
             position: absolute;
@@ -167,11 +170,6 @@ img {
     right: 50px;
     width: 120px;
         }
-#drop-area {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
 .container {
     position: relative;
 }
@@ -225,4 +223,13 @@ img {
     white-space: nowrap;
     text-overflow: ellipsis;
     width: 52px;
+}
+.form-block {
+    clear: both;
+}
+h5.login-info {
+    float: right;
+}
+.error {
+    color: red;
 }

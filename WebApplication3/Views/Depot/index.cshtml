@@ -1,5 +1,5 @@
 ﻿@model WebApplication3.Controllers.DepotController.BayViewModel
-<div class="form-group form-inline">
+<div class="form-group form-inline form-block">
     <label for="blockSelect">Chọn block:</label>
     <select class="form-control" id="blockSelect">
         <option value="A">A</option>
@@ -8,15 +8,15 @@
         <option value="D">D</option>
     </select>
 
-
-</div>
-
-<div id="drop-area">
-    <img src="~/Content/Images/container.png" alt="Description of image" id="move" />
-    <div class="container-popup">
-        <div class="popup" id="myPopup"><span id="close">X</span><div id="tableContainer"></div></div>
+    <div id="drop-area">
+        <img src="~/Content/Images/container.png" alt="Description of image" id="move" />
+        <div class="container-popup">
+            <div class="popup" id="myPopup"><span id="close">X</span><div id="tableContainer"></div></div>
+        </div>
     </div>
 </div>
+
+
 
 
 <div class="tab" id="tabs">
@@ -25,6 +25,7 @@
         string formattedBay = bay.Length == 2 ? $"{bay[0]}0{bay[1]}" : bay;
         <button class="tablinks" onclick="openTab(event, 'Tab@bay', '@bay')">@bay</button>
     }
+
 </div>
 
 <div id="left">

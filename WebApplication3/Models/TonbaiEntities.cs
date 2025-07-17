@@ -7,6 +7,7 @@ namespace DepotWebApp.Models
         {
         }
         public DbSet<Tonbai> Tonbais { get; set; }
-
+        public DbSet<User> Users { get; set; }
+        public DbSet<History> Histories { get; set; }
     }
 }

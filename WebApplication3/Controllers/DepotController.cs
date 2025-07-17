@@ -8,6 +8,7 @@ using System.Data.Entity;
 using System.Web.Script.Serialization;
 using System.IO;
 using System.Text.RegularExpressions;
+
 namespace WebApplication3.Controllers
 {
 
@@ -17,6 +18,13 @@ namespace WebApplication3.Controllers
         private TonbaiEntities _db = new TonbaiEntities();
         public ActionResult Index()
         {
+            var history = new History();
+  
+            if (Session["user"] == null)
+            {
+                // Chưa đăng nhập, điều hướng về trang login
+                return RedirectToAction("Login", "Depot");
+            }
             var data = _db.Tonbais
               .Where(tb => tb.Block == "A")
               .Select(tb => tb.Bay.Trim())
@@ -206,6 +214,9 @@ namespace WebApplication3.Controllers
                     tonbai.Truck = null;
                     _db.SaveChanges();
 
+                    // Update history
+                    updateHistory(tonbai);
+
                     return Json(new { message = "Cập nhật thành công." });
                 }
                 return Json(new { message = "Không tìm thấy bản ghi để cập nhật." });
@@ -220,6 +231,10 @@ namespace WebApplication3.Controllers
             var jsonString = reader.ReadToEnd();
             var serializer = new JavaScriptSerializer();
             var data = serializer.Deserialize<Dictionary<string, object>>(jsonString);
+            
+            try
+            { 
+
             if (data != null && data.ContainsKey("block") && data.ContainsKey("bay"))
             {
                 //int id = Convert.ToInt32(data["id"]);
@@ -229,8 +244,9 @@ namespace WebApplication3.Controllers
                 string row = data["row"].ToString();
                 string tier = data["tier"].ToString();
                 string position = data["position"].ToString();
-                // Cập nhật thông tin
-                var tonbai = _db.Tonbais.Find(socont);
+                
+                    // Cập nhật thông tin
+                    var tonbai = _db.Tonbais.Find(socont);
                 if (tonbai != null)
                 {
                     tonbai.Block = block;
@@ -241,12 +257,14 @@ namespace WebApplication3.Controllers
                     tonbai.Position = position;
                     tonbai.Move = null;
                     _db.SaveChanges();
+                    // Update history
+                    updateHistory(tonbai);
 
                     return Json(new { message = "Cập nhật thành công." });
                 }
                 return Json(new { message = "Không tìm thấy bản ghi để cập nhật." });
             }
-
+            // In case moving
             else if (data != null && data.ContainsKey("socont") && data.ContainsKey("row") && data.ContainsKey("tier"))
             {
                 //int id = Convert.ToInt32(data["id"]);
@@ -254,6 +272,7 @@ namespace WebApplication3.Controllers
                 string row = data["row"].ToString();
                 string tier = data["tier"].ToString();
                 string position = data["position"].ToString();
+
                 // Cập nhật thông tin
                 var tonbai = _db.Tonbais.Find(socont);
                 if (tonbai != null)
@@ -262,12 +281,28 @@ namespace WebApplication3.Controllers
                     tonbai.Tier = tier;
                     tonbai.Position = position;
                     _db.SaveChanges();
-
+                    // Upadte history
+                    updateHistory(tonbai);
+                       
                     return Json(new { message = "Cập nhật thành công." });
                 }
                 return Json(new { message = "Không tìm thấy bản ghi để cập nhật." });
             }
             return Json(new { message = "Thiếu thông tin cần thiết." });
+
+
+            }
+            catch (System.Data.Entity.Infrastructure.DbUpdateException ex)
+            {
+                Console.WriteLine(ex.Message);
+                var innerException = ex.InnerException != null ? ex.InnerException.Message : "Không có thông tin chi tiết.";
+
+                return Json(new { message = "Thiếu thông tin cần thiết." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { message = "Có lỗi xảy ra: " + ex.Message });
+            }
         }
 
 
@@ -298,6 +333,9 @@ namespace WebApplication3.Controllers
                     tonbai.Truck = "Yes";
                     _db.SaveChanges();
 
+                    // Update history
+                    updateHistory(tonbai);
+
                     return Json(new { message = "Cập nhật thành công." });
                 }
                 return Json(new { message = "Không tìm thấy bản ghi để cập nhật." });
@@ -305,6 +343,63 @@ namespace WebApplication3.Controllers
             return Json(new { message = "Thiếu thông tin cần thiết." });
         }
 
+        public ActionResult login()
+        {
+            if (Session["user"] != null)
+            {
+                return RedirectToAction("Index", "Depot");
+            }
+            return View();
+        }
 
+        [HttpPost]
+        public ActionResult Login(string username, string password, string _zone)
+        {
+            if (IsValidUser(username, password))
+            {
+                Session["user"] = username;
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.Error = "Tài khoản hoặc mật khẩu không đúng";
+            return View();
+        }
+
+        private bool IsValidUser(string username, string password)
+        {
+            return _db.Users.Any(u => u.Tendangnhap == username && u.Matkhau == password);
+
+        }
+
+        public ActionResult Logout()
+        {
+            Session.Clear();
+            return RedirectToAction("Login", "Depot");
+        }
+        
+        public void updateHistory(Tonbai tonbai)
+        {
+            var user = Session["user"].ToString();
+            var history = new History
+            {
+                SoCont = tonbai.SoCont,
+                //SoPhieu = tonbai.SoPhieu,
+                Block = tonbai.Block,
+                Bay = tonbai.Bay,
+                Row = tonbai.Row,
+                Tier = tonbai.Tier,
+                HangTau = tonbai.HangTau,
+                NgThucHien = DateTime.Now.ToString("MM/dd/yyyy"),
+                GioThucHien = DateTime.Now.ToString("HH/mm"),
+                KeySoPhieu = tonbai.KeySoPhieu,
+                NguoiDung = user
+            };
+
+            _db.Histories.Add(history);
+            _db.SaveChanges();
+        }
     }
+
+    
+
 }

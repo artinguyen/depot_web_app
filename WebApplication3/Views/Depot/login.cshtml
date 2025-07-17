@@ -1,0 +1,65 @@
+﻿@{
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body class="login-page bg-body-secondary">
+    <div class="login-page bg-body-secondary app-loaded">
+        <div class="login-box">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <a href="../index2.html"
+                       class="link-dark text-center link-offset-2 link-opacity-100 link-opacity-50-hover">
+                        <h1 class="mb-0"><b>Depot App</b></h1>
+                    </a>
+                </div>
+                <div class="card-body login-card-body">
+                    
+                    <form action="" method="post">
+                        <div class="input-group mb-1">
+                            <div class="form-floating">
+                                <input id="loginEmail" type="text" class="form-control" value="" placeholder="" name="username" />
+                                <label for="loginEmail">Username</label>
+                            </div>
+                            <div class="input-group-text"><span class="bi bi-envelope"></span></div>
+                        </div>
+                        <div class="input-group mb-1">
+                            <div class="form-floating">
+                                <input id="loginPassword" type="password" class="form-control" placeholder="" name="password" />
+                                <label for="loginPassword">Password</label>
+                            </div>
+                            <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
+                        </div>
+
+                        <h6 class="error">@ViewBag.Error</h6>
+                        <!--begin::Row-->
+                        <div class="row">
+
+                            <!-- /.col -->
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Sign In</button>
+                                </div>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                        <!--end::Row-->
+                    </form>
+
+                    <!-- /.social-auth-links -->
+
+                </div>
+                <!-- /.login-card-body -->
+            </div>
+        </div>
+        
+    </div>
+</body>
+
+</html>

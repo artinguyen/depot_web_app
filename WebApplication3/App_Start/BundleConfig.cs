@@ -12,9 +12,11 @@ namespace WebApplication3
                       "~/Scripts/bootstrap.js"));
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                       "~/Scripts/config-color.js",
+                      "~/Scripts/adminlte.min.js",
                       "~/Scripts/site.js"));
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
+                      //"~/Content/bootstrap.css",
+                       "~/Content/adminlte.css",
                       "~/Content/site.css"));
                       
         }

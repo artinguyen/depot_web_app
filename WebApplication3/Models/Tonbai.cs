@@ -30,6 +30,7 @@ namespace DepotWebApp.Models
         public string KichCo { get; set; }
 
         public string Position { get; set; }
+        public string KeySoPhieu { get; set; }
         /*
         [Column("ID")]
         public decimal? ID { get; set; } // Nullable vì trong bảng cho phép NULL
