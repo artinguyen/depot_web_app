@@ -165,6 +165,14 @@ namespace WebApplication3.Controllers
             return Json(filteredList, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult GetBarContainer(string block, string bay)
+        {
+            var filteredList = _db.Tonbais
+                   .Where(tb => tb.Truck == "Bar")
+                   .ToList();
+            return Json(filteredList, JsonRequestBehavior.AllowGet);
+        }
+
         private string RemoveWhitespace(string input)
         {
             return Regex.Replace(input, @"\s+", string.Empty);

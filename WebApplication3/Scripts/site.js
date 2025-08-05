@@ -72,6 +72,10 @@ function dropHandler(ev) {
             if (currentContainer.includes('move')) {
                 currentInfo = document.getElementById(currentContainer.replace('move', ''));
             }
+
+            if (currentContainer.includes('bar')) {
+                currentInfo = document.getElementById(currentContainer.replace('bar', ''));
+            }
             
             const currentSize = currentInfo.getAttribute('data-size');
             // 
@@ -94,6 +98,10 @@ function dropHandler(ev) {
             }
             if (currentContainer.includes('move')) {
                 currentInfo = document.getElementById(currentContainer.replace('move', ''));
+            }
+
+            if (currentContainer.includes('bar')) {
+                currentInfo = document.getElementById(currentContainer.replace('bar', ''));
             }
             const currentSize = currentInfo.getAttribute('data-size');
 
@@ -121,6 +129,9 @@ function dropHandler(ev) {
             if (currentContainer.includes('move')) {
                 currentInfo = document.getElementById(currentContainer.replace('move', ''));
             }
+            if (currentContainer.includes('bar')) {
+                currentInfo = document.getElementById(currentContainer.replace('bar', ''));
+            }
             const currentSize = currentInfo.getAttribute('data-size');
             let currentSizeCell = ((currentCell.getElementsByTagName('div'))[0]).getAttribute('data-size');
             if (currentSizeCell[1] == '2' && currentSize[1] != '2') {
@@ -139,11 +150,18 @@ function dropHandler(ev) {
             let data = ev.dataTransfer.getData("text");
             const containsMove = data.includes('move'); // Kiểm tra có chứa "move || truck"
             const containsTruck = data.includes('truck');
+            const containsBar = data.includes('bar');
+            let table = 'truck-table';
             // Move item from move or truck table to myTable
-            if (containsMove || containsTruck) {
+            if (containsMove || containsTruck || containsBar) {
                 data = data.replace('truck', '');
                 if (containsMove) {
                     data = data.replace('move', '');
+                    table = 'move-table';
+                }
+                if (containsBar) {
+                    data = data.replace('bar', '');
+                    table = 'cargo-table';
                 }
                 const blinkingText = document.createElement('div');
                 blinkingText.className = 'blinking-text st-cont';
@@ -178,6 +196,10 @@ function dropHandler(ev) {
                 const selectedBlock = blockSelect.value;
                 const activeElement = document.querySelector('.active');
                 let activeBay = activeElement.innerText;
+
+                //console.log(document.getElementById(data).parentNode.parentNode)
+                document.getElementById(data).parentNode.parentNode.remove();
+
                 const dataCntr = {
                     //'id': dataId,
                     'block': selectedBlock,
@@ -189,7 +211,7 @@ function dropHandler(ev) {
                 };
                 // Update position of container
                 updatePosition(dataCntr);
-                document.getElementById(data).parentNode.parentNode.remove();
+
             } else {
                 const data = ev.dataTransfer.getData("text");          
                 const _this = ev.target;
@@ -492,6 +514,11 @@ function touchMoveHandlerTruck(ev) {
     const touch = ev.touches[0];
 }
 
+function touchMoveHandlerBar(ev) {
+    if (!currentDraggedElement) return;
+    const touch = ev.touches[0];
+}
+
 function touchEndHandlerMove(ev) {
     const dropTarget = document.elementFromPoint(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
     const socont = currentDraggedElement.getAttribute('data-id').trim();
@@ -619,6 +646,11 @@ function touchEndHandler(ev) {
     }
 
     if (dropTarget.getAttribute('id') == 'truck') {
+        if (currentDraggedElement.closest('table').getAttribute('id') == 'cargo-table') {
+             return;
+        }
+
+        
         //dropTarget.appendChild(currentDraggedElement);
         if (socont == null) {
             socont = currentDraggedElement.getAttribute('id').trim();
@@ -861,7 +893,9 @@ document.getElementById('blockSelect').addEventListener('change', function () {
                         tabButton.onclick = function (event) {
                             openTab(event, `Tab@bay${item.Bay}`, item.Bay);
                         };
+                        tabButton.style.backgroundColor = '#' + tabColor[item.Bay];
                         document.getElementById('tabs').appendChild(tabButton);
+                        
 
                     });
 
@@ -887,6 +921,7 @@ setInterval(function () {
     let info = getSelectedBlockAndBay();
     getMoveContainer(info.selectedBlock, info.activeBay);
     getTruckContainer(info.selectedBlock, info.activeBay);
+    getBarContainer(info.selectedBlock, info.activeBay);
 
 }, 2000);
 
@@ -898,9 +933,8 @@ dropArea.addEventListener('dragover', (event) => {
 
 dropArea.addEventListener('drop', (ev) => {
     event.preventDefault();
-    const data = ev.dataTransfer.getData("text");
-    let cont = document.getElementById(data);
-    cont.remove();
+    let data = ev.dataTransfer.getData("text");
+  
     /*
     const blockSelect = document.getElementById('blockSelect');
     const selectedBlock = blockSelect.value;
@@ -911,6 +945,19 @@ dropArea.addEventListener('drop', (ev) => {
         activeBay = activeBay[0] + activeBay[2];
     }
     */
+    const containsBar = data.includes('bar');
+
+    if (containsBar) {
+        data = data.replace('bar', '');
+    }
+
+    if (containsBar) {
+        document.getElementById(data).parentNode.parentNode.remove();
+    } else {
+        let cont = document.getElementById(data);
+        cont.remove();
+    }
+
     let info = getSelectedBlockAndBay();
     const dataCntr = {
         //'id': dataId,
@@ -972,6 +1019,25 @@ function getTruckContainer(block, bay) {
     });
 }
 
+// Get position of truck containers
+function getBarContainer(block, bay) {
+    fetch(`/Depot/GetBarContainer/${block}/${bay}`, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        createBarTable(data);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+
 // Create table for truck area
 function createTruckTable(data) {
     const tableContainer = document.getElementById('tableTruck');
@@ -1021,6 +1087,54 @@ function createTruckTable(data) {
     tableContainer.appendChild(table);
 }
 
+// Create table for truck area
+function createBarTable(data) {
+    const tableContainer = document.getElementById('tableCargo');
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+    const headerRow = document.createElement('tr');
+    const headers = ['Số cont'];
+
+    tableContainer.innerHTML = '';
+    table.setAttribute('id', 'cargo-table');
+
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    if (data.length > 0) {
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            const div = document.createElement('div');
+            div.setAttribute('draggable', 'true');
+            // Add dragstart event listener
+            div.addEventListener('dragstart', dragstartHandlerBarCont);
+            // For mobile event
+            div.addEventListener('touchstart', touchStartHandlerTruck);
+            div.addEventListener('touchmove', touchMoveHandlerBar);
+            div.addEventListener('touchend', touchEndHandler);
+            //div.setAttribute('ondragstart', 'dragstartHandler(event)');
+            div.setAttribute('id', item.SoCont.trim());
+            div.setAttribute('data-id', item.SoCont);
+            div.setAttribute('data-size', item.KichCo);
+            div.innerText = item.SoCont;
+
+            const cell = document.createElement('td');
+            cell.appendChild(div);
+            row.appendChild(cell);
+            tbody.appendChild(row);
+        });
+    } else {
+        tbody.innerHTML = '<tr><td>Không có dữ liệu </td></tr>';
+    }
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
+}
 
 // Function to create table for moving area
 function createTable(data) {
@@ -1080,6 +1194,11 @@ function dragstartHandlerTruckCont(event) {
     event.dataTransfer.setData('text', 'truck' + event.target.id);
 }
 
+function dragstartHandlerBarCont(event) {
+    localStorage.removeItem('item')
+    event.dataTransfer.setData('text', 'bar' + event.target.id);
+}
+
 // Close moving popup
 const closePopup = document.getElementById('close');
 closePopup.addEventListener('click', function (event) {
@@ -1095,6 +1214,12 @@ closeTruckPopup.addEventListener('click', function (event) {
     truckPopup.style.display = 'none';
 })
 
+// Close truck popup
+const closeCargoPopup = document.getElementById('close-cargo');
+closeCargoPopup.addEventListener('click', function (event) {
+    cargoPopup.style.display = 'none';
+})
+
 const truckArea = document.getElementById('truck-area');
 truckArea.addEventListener('dragover', (event) => {
     event.preventDefault();
@@ -1105,6 +1230,10 @@ truckArea.addEventListener('drop', (ev) => {
     event.preventDefault();
     let data = ev.dataTransfer.getData("text");
     const containsMove = data.includes('move');
+    const containsBar = data.includes('bar');
+    if (containsBar) {
+        return false;
+    }
     let isMove = false;
     if (containsMove) {
         data = data.replace('move', '');
@@ -1148,6 +1277,20 @@ truckDiv.addEventListener('click', function (event) {
     const y = event.clientY - rect.top;
     truckPopup.style.display = 'block';
 });
+// Cargo popup
+// Popup
+const cargoDiv = document.getElementById('cargo');
+const cargoPopup = document.getElementById('cargoPopup');
+
+// Show popup when click on truck image
+cargoDiv.addEventListener('click', function (event) {
+    getBarContainer(getSelectedBlockAndBay().selectedBlock, getSelectedBlockAndBay().activeBay);
+    const rect = cargoDiv.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    cargoPopup.style.display = 'block';
+});
+
 
 function getSelectedBlockAndBay() {
     const blockSelect = document.getElementById('blockSelect');
@@ -1203,3 +1346,10 @@ function checkMediaQuery() {
 checkMediaQuery();
 // Thêm sự kiện lắng nghe thay đổi kích thước màn hình
 window.addEventListener('resize', checkMediaQuery);
+
+// After page is loaded, trigger event
+document.addEventListener("DOMContentLoaded", function () {
+    const selectElement = document.getElementById("blockSelect");
+    const event = new Event("change");
+    selectElement.dispatchEvent(event); // Gọi sự kiện change
+});

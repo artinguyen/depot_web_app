@@ -101,7 +101,7 @@ th {
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 5px 22px;
+    padding: 2px 6px;
     margin: 0;
     transition: 0.3s;
     font-size: 17px;
@@ -130,7 +130,7 @@ th {
 #num-container {
     font-weight: bold;
     padding: 8px 0px;
-    display: inline-block;
+    #display: inline-block;
 }
 
 #myTable1 td, #myTable td, #myTable th{
@@ -144,9 +144,11 @@ th {
 }
 img {
     width: 50px;
-    float: right;
+    #float: right;
 }
-
+#num-container {
+    clear:both;
+}
 /* Popup */
 .popup {
     display: none;
@@ -155,8 +157,8 @@ img {
     border: 1px solid #ccc;
     padding: 2px;
     z-index: 1000;
-    top: 40px;
-    right: 65px;
+    top: -32px;
+    right: -130px;
     width: 120px;
 }
 .tk-popup {
@@ -167,26 +169,41 @@ img {
             padding: 2px;
             z-index: 1000;
             top: -50px;
-    right: 50px;
+
     width: 120px;
         }
+
+.cg-popup {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 2px;
+            z-index: 1000;
+            top: -50px;
+    left: 50px;
+    width: 120px;
+        }
+
 .container {
     position: relative;
 }
-#tableContainer table, #tableTruck table {
+#tableContainer table, #tableTruck table, #tableCargo table {
     width: 100%;
 }
-#tableContainer, #tableTruck {
+#tableContainer, #tableTruck, #tableCargo {
     max-height: 165px;
     overflow-y: auto;
 }
-#tableContainer table td,  #tableTruck table td{
+#tableContainer table td,  #tableTruck table td, #tableCargo table td{
     border:1px solid black;
     text-align: center;
 }
-#tableContainer table th, #tableTruck table th{
+#tableContainer table th, #tableTruck table th, #tableCargo table th{
     text-align: center;
 }
+
+
 
 @keyframes blink {
             0% {
@@ -210,13 +227,33 @@ img {
     text-overflow: ellipsis;
     width: 52px;
         }
-#close, #close-truck {
+#close, #close-truck{
     position: absolute;
     right: 5px;
     cursor: pointer;
 }
-#truck-area {
+
+#close-cargo {
+    position: absolute;
+    right: 5px;
+    cursor: pointer;
+}
+#truck-area, #cargo-area {
     position: relative;
+}
+#truck-area {
+    margin-top: 50px;
+    display: inline-block;
+}
+.truck-popup .tk-popup {
+    top: 50px;
+}
+#drop-area {
+    display: table;
+    position: relative;
+}
+#cargo {
+    float: left;
 }
 .align-div {
     overflow: hidden;
@@ -232,4 +269,8 @@ h5.login-info {
 }
 .error {
     color: red;
+}
+#myTable {
+    float:left;
+    margin-right: 20px;
 }
